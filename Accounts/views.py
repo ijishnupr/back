@@ -4,6 +4,8 @@ from .serializers import *
 from .models import *
 from django.http import JsonResponse
 from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser, BasePermission
 
 
 # Create your views here.
@@ -99,3 +101,5 @@ def logout_view(request):
             return JsonResponse({'message': 'User already logged out'}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({"Error": "User customer not provided"}, status=status.HTTP_400_BAD_REQUEST)
+    
+
