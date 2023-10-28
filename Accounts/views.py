@@ -40,7 +40,7 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from .models import UserPostNatal, UserPostNatalToken  # Import your custom token model
+from .models import UserPostNatal  # Import your custom token model
 from .serializers import UserPostNatalSerializer
 
 @api_view(['POST'])
