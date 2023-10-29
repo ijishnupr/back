@@ -6,6 +6,9 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser, BasePermission
+from rest_framework import generics
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
 
 
 # Create your views here.
@@ -21,18 +24,33 @@ class UserRegistrationView(APIView):
                 firstname=serializer.validated_data['firstname'],
                 lastname=serializer.validated_data['lastname'],
                 mobile=serializer.validated_data['mobile'],
-                babydob=serializer.validated_data['babydob'],
-                babyGender=serializer.validated_data['babyGender'],
                 fcm_token=serializer.validated_data['fcm_token'],
-                profile_img=serializer.validated_data['profile_img'],
                 password=serializer.validated_data['password']  # Set the password
             )
-            user.save()
 
+            # Create CustomerDetails for the user
+            customer_details_data = {
+                "user": user.pk,  # Pass the user's primary key
+                "address": "",  # Add any other fields as needed
+                "date_of_birth_parent": None,
+                "babydob": None,
+                "babyGender": None
+            }
+            customer_details_serializer = CustomerDetailsSerializer(data=customer_details_data)
 
+            if customer_details_serializer.is_valid():
+                customer_details_serializer.save()
+            else:
+                # Handle errors with CustomerDetails creation
+                user.delete()  # Delete the user if CustomerDetails creation fails
+                return Response(
+                    customer_details_serializer.errors,
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-            return JsonResponse({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
-        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 
 from django.contrib.auth import login as django_login
@@ -44,7 +62,7 @@ from .models import UserPostNatal  # Import your custom token model
 from .serializers import UserPostNatalSerializer
 
 @api_view(['POST'])
-@permission_classes((AllowAny,))
+@permission_classes([AllowAny])
 def login_view(request):
     data = request.data
     email = data.get('email')
@@ -64,17 +82,16 @@ def login_view(request):
                 status=status.HTTP_401_UNAUTHORIZED
             )
         else:
-            # Log the user in with the specified backend
-            user_postnatal.backend = 'django.contrib.auth.backends.ModelBackend'  # Set the backend
-            django_login(request, user_postnatal)  # Log in the user
+            # Log the user in
+            django_login(request, user_postnatal)
 
-            # # Get or create a token for the user using the custom token model
-            # token, created = Token.objects.get_or_create(user=user_postnatal)
+            # Check if the user already has a token
+            token, created = Token.objects.get_or_create(user=user_postnatal)
 
             return JsonResponse(
                 {
                     "message": "User is logged in successfully.",
-                    # "token": token.key  # Include the token in the response
+                    "token": token.key  # Include the token in the response
                 },
                 status=status.HTTP_200_OK
             )
@@ -103,3 +120,38 @@ def logout_view(request):
         return JsonResponse({"Error": "User customer not provided"}, status=status.HTTP_400_BAD_REQUEST)
     
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_customer_details(request):
+    user = request.user  # Retrieve the user associated with the token
+
+    try:
+        customer_details = CustomerDetails.objects.get(user=user)
+        serializer = CustomerDetailsSerializer(customer_details)
+        return Response(serializer.data, status=200)
+    except CustomerDetails.DoesNotExist:
+        return Response({"error": "Customer details not found for this user."}, status=404)
+
+
+from django.views.decorators.csrf import csrf_exempt
+
+@api_view(['POST'])  # Change to POST
+@permission_classes([IsAuthenticated])
+@csrf_exempt
+def update_customer_details(request):
+    user = request.user  # Retrieve the user associated with the token
+    print(f"User: {user}")  # Print user for debugging
+    print(f"Request Data: {request.data}")
+
+    try:
+        customer_details = CustomerDetails.objects.get(user=user)
+    except CustomerDetails.DoesNotExist:
+        return Response({"error": "Customer details not found for this user."}, status=404)
+
+    serializer = CustomerDetailsSerializer(customer_details, data=request.data, partial=True)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=200)
+    else:
+        return Response(serializer.errors, status=400)
