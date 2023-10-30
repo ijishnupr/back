@@ -9,6 +9,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser, B
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from django.http import Http404
+
 
 
 # Create your views here.
@@ -19,7 +21,7 @@ class UserRegistrationView(APIView):
 
         if serializer.is_valid():
             # Create the user instance
-            user = UserPostNatal.objects.create_user(
+            user = User.objects.create_user(
                 email=serializer.validated_data['email'],
                 firstname=serializer.validated_data['firstname'],
                 lastname=serializer.validated_data['lastname'],
@@ -58,7 +60,7 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from .models import UserPostNatal  # Import your custom token model
+from .models import User  # Import your custom token model
 from .serializers import UserPostNatalSerializer
 
 @api_view(['POST'])
@@ -69,8 +71,8 @@ def login_view(request):
     password = data.get('password')
 
     try:
-        user_postnatal = UserPostNatal.objects.get(email=email)
-    except UserPostNatal.DoesNotExist:
+        user_postnatal = User.objects.get(email=email)
+    except User.DoesNotExist:
         user_postnatal = None
 
     if user_postnatal is not None and user_postnatal.check_password(password):
@@ -82,8 +84,9 @@ def login_view(request):
                 status=status.HTTP_401_UNAUTHORIZED
             )
         else:
-            # Log the user in
-            django_login(request, user_postnatal)
+            # Log the user in with the specified backend
+            user_postnatal.backend = 'django.contrib.auth.backends.ModelBackend'  # Set the backend
+            django_login(request, user_postnatal)  # Log in the user
 
             # Check if the user already has a token
             token, created = Token.objects.get_or_create(user=user_postnatal)
@@ -155,3 +158,39 @@ def update_customer_details(request):
         return Response(serializer.data, status=200)
     else:
         return Response(serializer.errors, status=400)
+    
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def admin_update_customer_details(request):
+    # Get the user_id from the query parameters
+    user_id = request.GET.get('user_id')
+
+    # Check if user_id is a valid integer
+    try:
+        user_id = int(user_id)
+    except (TypeError, ValueError):
+        return JsonResponse({'error': 'Invalid user_id'}, status=400)
+
+    # Check if the user exists
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+
+    # Check if the user has associated customer details
+    try:
+        customer_details = CustomerDetails.objects.get(user=user)
+    except CustomerDetails.DoesNotExist:
+        return JsonResponse({'error': 'Customer details not found for this user.'}, status=404)
+
+    # Update customer details based on the request data
+    if request.method == 'PATCH':
+        serializer = CustomerDetailsSerializer(customer_details, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=200)
+        else:
+            return JsonResponse(serializer.errors, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method. Use PATCH to update customer details.'}, status=400)

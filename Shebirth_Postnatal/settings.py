@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'Accounts',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
 
 ]
 
@@ -51,6 +52,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'Shebirth_Postnatal.urls'
@@ -123,7 +126,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -131,7 +134,11 @@ USE_L10N = True
 
 USE_TZ = True
 
-AUTH_USER_MODEL= 'Accounts.UserPostNatal'
+AUTH_USER_MODEL= 'Accounts.User'
+
+
+APPEND_SLASH = False
+
 
 
 # Static files (CSS, JavaScript, Images)
@@ -150,3 +157,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Replace with the origin of your React app
+    # You can add other allowed origins here
+]

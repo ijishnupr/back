@@ -3,7 +3,7 @@ from .models import *
 
 class UserPostNatalSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserPostNatal
+        model = User
         fields = ('email', 'firstname', 'lastname', 'mobile', 'fcm_token','password')
         extra_kwargs = {
             'password': {'write_only': True},

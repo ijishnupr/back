@@ -14,7 +14,7 @@ from django.utils import timezone
 
 from django.contrib.auth.models import BaseUserManager
 
-class UserPostNatalManager(BaseUserManager):
+class UserManager(BaseUserManager):
     def create_user(self, email, firstname, lastname, password=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
@@ -30,7 +30,7 @@ class UserPostNatalManager(BaseUserManager):
 
         return self.create_user(email, firstname, lastname, password, **extra_fields)
 
-class UserPostNatal(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, PermissionsMixin):
     ROLES = (
         ('client', 'Client'),
         ('doctor', 'Doctor'),
@@ -56,12 +56,12 @@ class UserPostNatal(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f'{self.email} | {self.firstname}'
 
-    objects = UserPostNatalManager()
+    objects = UserManager()
 
 
 
 class CustomerDetails(models.Model):
-    user = models.OneToOneField(UserPostNatal, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     address = models.CharField(max_length=200, blank=True, null=True)
     date_of_birth_parent = models.DateField(blank=True, null=True)
     babydob = models.DateField(null=True)
