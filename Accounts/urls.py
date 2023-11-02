@@ -9,6 +9,7 @@ urlpatterns = [
     path('get-customer-details/', get_customer_details, name='get-customer-details'),
     path('update-customer-details/', update_customer_details, name='update-customer-details'),
     path('admin-update-customer-details/',admin_update_customer_details, name='admin-update-customer-details'),
+    path('doctor_registration/', doctor_registration, name='doctor_registration'),
 ]
 
 

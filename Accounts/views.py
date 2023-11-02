@@ -10,6 +10,8 @@ from rest_framework import generics
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.http import Http404
+from rest_framework.decorators import api_view, permission_classes
+
 
 
 
@@ -52,7 +54,29 @@ class UserRegistrationView(APIView):
 
             return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['POST'])
+def doctor_registration(request):
+    serializer = DoctorRegistrationSerializer(data=request.data)
 
+    if serializer.is_valid():
+        user_data = {
+            'email': serializer.validated_data['email'],
+            'password': serializer.validated_data['password'],
+            'firstname': serializer.validated_data['firstname'],
+            'lastname': serializer.validated_data['lastname'],
+        }
+        
+        # Create a new user
+        user_data['role'] = 'DOCTOR'
+        user = User.objects.create_user(**user_data)
+
+        # Create the associated doctor details
+        doctor_details_data = {k: v for k, v in serializer.validated_data.items() if k not in user_data}
+        DoctorDetails.objects.create(user=user, **doctor_details_data)
+
+        return Response({'success': 'Successfully registered'}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 from django.contrib.auth import login as django_login
@@ -62,6 +86,50 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import User  # Import your custom token model
 from .serializers import UserPostNatalSerializer
+
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
+# def login_view(request):
+#     data = request.data
+#     email = data.get('email')
+#     password = data.get('password')
+
+#     try:
+#         user_postnatal = User.objects.get(email=email)
+#     except User.DoesNotExist:
+#         user_postnatal = None
+
+#     if user_postnatal is not None and user_postnatal.check_password(password):
+#         if not user_postnatal.is_active:
+#             return JsonResponse(
+#                 {
+#                     "error": "Please call your salesperson to activate this account."
+#                 },
+#                 status=status.HTTP_401_UNAUTHORIZED
+#             )
+#         else:
+#             # Log the user in with the specified backend
+#             user_postnatal.backend = 'django.contrib.auth.backends.ModelBackend'  # Set the backend
+#             django_login(request, user_postnatal)  # Log in the user
+
+#             # Check if the user already has a token
+#             token, created = Token.objects.get_or_create(user=user_postnatal)
+
+#             return JsonResponse(
+#                 {
+#                     "message": "User is logged in successfully.",
+#                     "token": token.key  # Include the token in the response
+#                 },
+#                 status=status.HTTP_200_OK
+#             )
+#     else:
+#         return JsonResponse(
+#             {
+#                 "error": "Login failed"
+#             },
+#             status=status.HTTP_401_UNAUTHORIZED
+#         )
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -93,7 +161,7 @@ def login_view(request):
 
             return JsonResponse(
                 {
-                    "message": "User is logged in successfully.",
+                    "message": f"{user_postnatal.role} logged in successfully.",
                     "token": token.key  # Include the token in the response
                 },
                 status=status.HTTP_200_OK
@@ -194,3 +262,6 @@ def admin_update_customer_details(request):
             return JsonResponse(serializer.errors, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method. Use PATCH to update customer details.'}, status=400)
+    
+
+

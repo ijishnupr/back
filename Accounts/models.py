@@ -32,12 +32,12 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     ROLES = (
-        ('client', 'Client'),
-        ('doctor', 'Doctor'),
-        ('sales', 'Sales'),
-        ('admin', 'Admin'),  # Added 'admin' role
+        ('CLIENT', 'Client'),
+        ('DOCTOR', 'Doctor'),
+        ('SALES', 'Sales'),
+        ('ADMIN', 'Admin'),  # Added 'admin' role
     )
-    role = models.CharField(max_length=10, choices=ROLES, default='client')
+    role = models.CharField(max_length=10, choices=ROLES, default='CLIENT')
     email = models.EmailField(unique=True, max_length=300, default="example@email.com", blank=False)
     firstname = models.CharField(max_length=100, default="firstname")
     lastname = models.CharField(max_length=100, null=True)
@@ -58,6 +58,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
+    @property
+    def is_doctor(self):
+        return self.role == 'DOCTOR'
+
 
 
 class CustomerDetails(models.Model):
@@ -72,6 +76,38 @@ class CustomerDetails(models.Model):
     def __str__(self):
         return f'Customer Details for {self.user.email}'
     
+
+
+
+class DoctorDetails(models.Model):
+    FEMALE = "female"
+    MALE = "male"
+
+    GENDER_CHOICES = (
+        (FEMALE,'female'),
+        (MALE, 'male'),
+    )
+
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='docDetails',null=True)
+    speciality = models.CharField(max_length=200, null=True)
+    qualification = models.CharField(max_length=200, null=True)
+    medicalCouncil = models.CharField(max_length=20, null=True)
+    councilRegNo = models.CharField(max_length=200, null=True)
+    hospitals = models.CharField(max_length=300, null=True)
+    interests = models.CharField(max_length=200, null=True)
+    placeOfWork = models.CharField(max_length=200, null=True)
+    onlineConsultation = models.CharField(max_length=100, null=True)
+    experience = models.IntegerField(default=0)
+    age = models.IntegerField(default=0)
+    languages = models.CharField(max_length=500 ,default='')
+    location = models.CharField(max_length=200, null=True,blank=True)
+    referalId = models.CharField(max_length=100, null=True,unique=True)
+    price =  models.IntegerField(default=0)
+    gender = models.CharField(choices=GENDER_CHOICES, max_length=100, null=True, blank=True)
+
+
+
 
 
 
