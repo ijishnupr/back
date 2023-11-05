@@ -41,3 +41,49 @@ class DoctorRegistrationSerializer(serializers.Serializer):
     referalId = serializers.CharField(max_length=100, required=False, allow_blank=True)
     price = serializers.IntegerField(required=True)
     gender = serializers.ChoiceField(choices=DoctorDetails.GENDER_CHOICES, required=False, allow_blank=True)
+
+
+class SalesTeamRegistrationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+    firstname = serializers.CharField()
+    lastname = serializers.CharField(required=False, allow_blank=True)
+    location = serializers.CharField()
+
+    def create(self, validated_data):
+        email = validated_data['email']
+        password = validated_data['password']
+        firstname = validated_data['firstname']
+        lastname = validated_data.get('lastname', '')
+        location = validated_data['location']
+
+        # Create the user with the SALES role
+        user = User.objects.create_user(email=email, password=password, role='SALES', firstname=firstname, lastname=lastname)
+
+        # Create SalesTeamDetails
+        SalesTeamDetails.objects.create(user=user, location=location)
+
+        return user
+    
+
+class ConsultantTeamRegistrationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+    firstname = serializers.CharField()
+    lastname = serializers.CharField(required=False, allow_blank=True)
+    location = serializers.CharField()
+
+    def create(self, validated_data):
+        email = validated_data['email']
+        password = validated_data['password']
+        firstname = validated_data['firstname']
+        lastname = validated_data.get('lastname', '')
+        location = validated_data['location']
+
+        # Create the user with the CONSULTANT role
+        user = User.objects.create_user(email=email, password=password, role='CONSULTANT', firstname=firstname, lastname=lastname)
+
+        # Create ConsultantInfo
+        ConsultantInfo.objects.create(user=user, location=location)
+
+        return user

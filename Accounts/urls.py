@@ -10,6 +10,10 @@ urlpatterns = [
     path('update-customer-details/', update_customer_details, name='update-customer-details'),
     path('admin-update-customer-details/',admin_update_customer_details, name='admin-update-customer-details'),
     path('doctor_registration/', doctor_registration, name='doctor_registration'),
+    path('sales_team_registration/', sales_team_registration, name='sales_team_registration'),
+    path('consultant_registration/', consultant_registration, name='consultant_registration'),
+    
+
 ]
 
 

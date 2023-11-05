@@ -36,6 +36,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('DOCTOR', 'Doctor'),
         ('SALES', 'Sales'),
         ('ADMIN', 'Admin'),  # Added 'admin' role
+        ('CONSULTANT','Consultant')
     )
     role = models.CharField(max_length=10, choices=ROLES, default='CLIENT')
     email = models.EmailField(unique=True, max_length=300, default="example@email.com", blank=False)
@@ -105,6 +106,22 @@ class DoctorDetails(models.Model):
     referalId = models.CharField(max_length=100, null=True,unique=True)
     price =  models.IntegerField(default=0)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=100, null=True, blank=True)
+
+
+
+
+class SalesTeamDetails(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='salesDetails')
+    # age = models.IntegerField()
+    location = models.CharField(max_length=200, null=True, blank=True)
+    passwordString = models.CharField(max_length=500)
+
+
+class ConsultantInfo(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='consultantDetails')
+    # age = models.IntegerField()
+    location = models.CharField(max_length=200, null=True, blank=True)
+    passwordString = models.CharField(max_length=500)
 
 
 

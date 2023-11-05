@@ -265,3 +265,22 @@ def admin_update_customer_details(request):
     
 
 
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def sales_team_registration(request):
+    serializer = SalesTeamRegistrationSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        return Response({"message": "SALES team registered successfully."}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def consultant_registration(request):
+    serializer = ConsultantTeamRegistrationSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        return Response({"message": "Consultant registered successfully."}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
