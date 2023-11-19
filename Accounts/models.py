@@ -12,6 +12,7 @@ from django.utils import timezone
 
 
 
+
 from django.contrib.auth.models import BaseUserManager
 
 class UserManager(BaseUserManager):
@@ -63,23 +64,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_doctor(self):
         return self.role == 'DOCTOR'
 
-
-
-class CustomerDetails(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    address = models.CharField(max_length=200, blank=True, null=True)
-    date_of_birth_parent = models.DateField(blank=True, null=True)
-    babydob = models.DateField(null=True)
-    profile_img = models.ImageField(upload_to='ProfilePic/', null=True, blank=True, default='/ProfilePic/default.jpg')
-    babyGender = models.CharField(max_length=10, choices=(("male", "Male"), ("female", "Female")), null=True, blank=True)
-    # Add any other fields you want to store for customers
-
-    def __str__(self):
-        return f'Customer Details for {self.user.email}'
-    
-
-
-
 class DoctorDetails(models.Model):
     FEMALE = "female"
     MALE = "male"
@@ -107,6 +91,31 @@ class DoctorDetails(models.Model):
     price =  models.IntegerField(default=0)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=100, null=True, blank=True)
 
+    def __str__(self):
+        if self.user is not None:
+            return f'{self.user.email} Name: {self.user.firstname}'
+        else:
+            return self.user.firstname
+
+
+
+class CustomerDetails(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    address = models.CharField(max_length=200, blank=True, null=True)
+    date_of_birth_parent = models.DateField(blank=True, null=True)
+    babydob = models.DateField(null=True)
+    profile_img = models.ImageField(upload_to='ProfilePic/', null=True, blank=True, default='/ProfilePic/default.jpg')
+    babyGender = models.CharField(max_length=10, choices=(("male", "Male"), ("female", "Female")), null=True, blank=True)
+    # Add any other fields you want to store for customers
+    doctor_referal = models.ForeignKey(DoctorDetails, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return f'Customer email: {self.user.email}'
+    
+
+
+
+
 
 
 
@@ -116,12 +125,24 @@ class SalesTeamDetails(models.Model):
     location = models.CharField(max_length=200, null=True, blank=True)
     passwordString = models.CharField(max_length=500)
 
+    def __str__(self):
+        if self.user is not None:
+            return f'{self.user.email} Name: {self.user.firstname}'
+        else:
+            return self.user.firstname
+
 
 class ConsultantInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='consultantDetails')
     # age = models.IntegerField()
     location = models.CharField(max_length=200, null=True, blank=True)
     passwordString = models.CharField(max_length=500)
+
+    def __str__(self):
+        if self.user is not None:
+            return f'{self.user.email} Name: {self.user.firstname}'
+        else:
+            return self.user.firstname
 
 
 

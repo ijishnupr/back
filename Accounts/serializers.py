@@ -87,3 +87,22 @@ class ConsultantTeamRegistrationSerializer(serializers.Serializer):
         ConsultantInfo.objects.create(user=user, location=location)
 
         return user
+
+
+class DoctorDetailSerializer(serializers.ModelSerializer):
+    accountStatus = serializers.BooleanField(source='user.is_active')
+    
+    
+
+    # new
+    id = serializers.CharField(source='user.id')
+    firstname = serializers.CharField(source='user.firstname')
+    lastname = serializers.CharField(source='user.lastname')
+    email = serializers.CharField(source='user.email')
+    
+
+
+
+    class Meta:
+        model = DoctorDetails
+        fields = ['id' ,'firstname', 'hospitals','lastname', 'email', 'age', 'location', 'councilRegNo', 'experience','qualification','speciality', 'accountStatus', 'price', 'gender', 'languages', 'referalId',]
