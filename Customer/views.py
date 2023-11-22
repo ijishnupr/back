@@ -48,10 +48,10 @@ def update_date(instance, module):
 @permission_classes((IsAuthenticated,))
 def medicine_get(request):
     user = request.user
-    if not user.role == User.HOSPITAL_MANAGER:
+    if not user.role == 'SALES':
         # from calender
         date = request.query_params.get('date', None)
-        cid = user.id if user.role == User.CLIENT else request.query_params.get('customer', None)
+        cid = user.id if user.role == 'CLIENT' else request.query_params.get('customer', None)
         
         if cid is None:
             return Response({"Error" : "Provide id in params as customer:id"}, status=status.HTTP_400_BAD_REQUEST)
@@ -70,12 +70,12 @@ def medicine_get(request):
         return Response({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
     
 
-    
+
 @api_view(['POST',])
 @permission_classes((IsAuthenticated,))
 def medicine_post(request):
     user = request.user
-    if user.role == 'CLIENT' or user.role == User.SALES:
+    if user.role == 'CLIENT' or user.role == 'SALES':
         data = request.data.copy()
         if user.role == 'CLIENT':
             data['customer'] = user.id
