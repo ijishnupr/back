@@ -23,5 +23,7 @@ urlpatterns = [
     path('', include('Accounts.urls')),
     path('doctor/', include('Doctor.urls')),
     path('messages/',include('Messages.urls')),
+    path('learnit/',include('LearnIt.urls')),
+    path('customer/',include('Customer.urls')),
     
 ]

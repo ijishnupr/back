@@ -32,14 +32,21 @@ class UserManager(BaseUserManager):
         return self.create_user(email, firstname, lastname, password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
-    ROLES = (
-        ('CLIENT', 'Client'),
-        ('DOCTOR', 'Doctor'),
-        ('SALES', 'Sales'),
-        ('ADMIN', 'Admin'),  # Added 'admin' role
-        ('CONSULTANT','Consultant')
+    ADMIN = 1
+    DOCTOR = 2
+    CLIENT = 3
+    SALES = 4
+    CONSULTANT = 5
+
+    ROLE_CHOICES = (
+        (ADMIN, 'Admin'),
+        (DOCTOR, 'Doctor'),
+        (CLIENT, 'Client'),
+        (SALES, 'Sales'),
+        (CONSULTANT, 'Consultant'),
     )
-    role = models.CharField(max_length=10, choices=ROLES, default='CLIENT')
+
+    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, default=CLIENT)
     email = models.EmailField(unique=True, max_length=300, default="example@email.com", blank=False)
     firstname = models.CharField(max_length=100, default="firstname")
     lastname = models.CharField(max_length=100, null=True)
