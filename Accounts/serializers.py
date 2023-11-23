@@ -11,9 +11,14 @@ class UserPostNatalSerializer(serializers.ModelSerializer):
 
 
 class CustomerDetailsSerializer(serializers.ModelSerializer):
+    # Add a new field for first name, and use 'source' to point to the related User's first name
+    first_name = serializers.CharField(source='user.firstname', read_only=True)
+
     class Meta:
         model = CustomerDetails
-        fields = '__all__'  # Include all fields from the CustomerDetails model
+        fields = ['id', 'address', 'date_of_birth_parent', 'babydob', 'profile_img', 'babyGender', 'user', 'doctor_referal', 'first_name']
+
+
 
 
 from rest_framework.validators import UniqueValidator
