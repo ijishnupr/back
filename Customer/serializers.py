@@ -58,3 +58,8 @@ class MedicineTimeSerializer(serializers.ModelSerializer):
         model = MedicineTime
         fields = ['MedicationTime', 'Medicines']
     
+
+class BreastfeedingRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BreastfeedingRecord
+        fields = '__all__'

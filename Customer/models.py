@@ -70,3 +70,14 @@ class TakenMedicine(models.Model):
     class Meta:
         ordering = ['-date']
         unique_together = ['medicine', 'customer', 'date']
+
+
+
+class BreastfeedingRecord(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='breastfeeding_records')
+    date = models.DateField()
+    feeding_number = models.PositiveSmallIntegerField()
+    is_breastfed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user} - {self.date} - Feeding {self.feeding_number}: {self.is_breastfed}"
