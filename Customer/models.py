@@ -74,10 +74,19 @@ class TakenMedicine(models.Model):
 
 
 class BreastfeedingRecord(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='breastfeeding_records')
-    date = models.DateField()
-    feeding_number = models.PositiveSmallIntegerField()
+    feeding_number = models.CharField()
     is_breastfed = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.user} - {self.date} - Feeding {self.feeding_number}: {self.is_breastfed}"
+        return f"Breastfeeding Record - Feeding Number: {self.feeding_number}"
+    
+
+class UserBreastfeedingRecord(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    breastfeeding_record = models.ForeignKey(BreastfeedingRecord, on_delete=models.CASCADE, related_name='user_records')
+    date = models.DateField()  # Move date field to UserBreastfeedingRecord
+    is_breastfed = models.BooleanField(default=False)
+    feeding_number = models.IntegerField()
+
+    def __str__(self):
+        return f"User Breastfeeding Record - User: {self.user.firstname}, Record: {self.breastfeeding_record}"

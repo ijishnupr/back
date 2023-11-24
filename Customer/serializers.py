@@ -62,4 +62,9 @@ class MedicineTimeSerializer(serializers.ModelSerializer):
 class BreastfeedingRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = BreastfeedingRecord
-        fields = '__all__'
+        fields = ['feeding_number', 'is_breastfed']
+
+class UserBreastfeedingRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserBreastfeedingRecord
+        fields = ['user', 'breastfeeding_record', 'date', 'is_breastfed']

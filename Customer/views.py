@@ -174,74 +174,247 @@ def all_medicines(request):
     else:
         return Response({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
     
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def get_breastfeeding_records(request):
+#     user = request.user
+#     date_param = request.query_params.get('date', None)
+
+#     # Validate the date format (optional)
+#     try:
+#         if date_param:
+#             dt.strptime(date_param, '%Y-%m-%d')
+#     except ValueError:
+#         return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=400)
+
+#     # Filter records based on date parameter
+#     records = BreastfeedingRecord.objects.filter(user=user, date=date_param)
+#     serializer = BreastfeedingRecordSerializer(records, many=True)
+#     return Response(serializer.data)
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def create_breastfeeding_records(request):
+#     user = request.user
+
+#     date = request.data.get('date')
+
+#     # Check if records for the given user and date already exist
+#     existing_records = BreastfeedingRecord.objects.filter(
+#         user=user,
+#         date=date
+#     )
+
+#     # If records already exist, do nothing
+#     if existing_records:
+#         return Response({'message': 'Breastfeeding records already exist for this date'}, status=status.HTTP_200_OK)
+#     else:
+#         # If records don't exist, create 20 new records for the user and date
+#         for feeding_number in range(1, 21):
+#             record = BreastfeedingRecord.objects.create(
+#                 user=user,
+#                 date=date,
+#                 feeding_number=feeding_number,
+#                 is_breastfed=False  # Set is_breastfed to False by default
+#             )
+
+#     return Response({'message': 'Breastfeeding records created successfully'}, status=status.HTTP_201_CREATED)
+
+
+# @api_view(['PATCH'])
+# @permission_classes([IsAuthenticated])
+# def edit_breastfeeding_record(request):
+#     user = request.user
+#     date = request.data.get('date')
+#     feeding_number = request.data.get('feeding_number')
+
+#     # Get the record for the specified user, date, and feeding_number
+#     try:
+#         record = BreastfeedingRecord.objects.get(
+#             user=user,
+#             date=date,
+#             feeding_number=feeding_number
+#         )
+#     except BreastfeedingRecord.DoesNotExist:
+#         return Response({'error': 'Record not found'}, status=status.HTTP_404_NOT_FOUND)
+
+#     # Update the is_breastfed field based on the request data
+#     is_breastfed = request.data.get('is_breastfed', False)
+#     record.is_breastfed = is_breastfed
+#     record.save()
+
+#     serializer = BreastfeedingRecordSerializer(record)
+#     return Response({'message': 'Record updated successfully', 'data': serializer.data})
+
+
+
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def get_breastfeeding_records(request):
+#     user = request.user
+#     context = {}
+
+#     # Get the date from query parameters, or use the current date if not provided
+#     date = request.query_params.get('date', None)
+#     if not date:
+#         date = datetime.datetime.now().date()
+
+#     # Assuming 'customer' is the related name in the User model for the BreastfeedingRecord
+#     if user.role == 'CLIENT':
+#         cid = user.id
+#     else:
+#         cid = request.query_params.get('customer', None)
+#         try:
+#             user = User.objects.get(id=cid)
+#             cid = user.id
+#         except User.DoesNotExist:
+#             return Response({"error": "client not found"}, status=status.HTTP_404_NOT_FOUND)
+
+#     # Your logic for retrieving and serializing breastfeeding records goes here
+#     records = UserBreastfeedingRecord.objects.filter(user=user, date=date)
+#     serializer = UserBreastfeedingRecordSerializer(records, many=True)
+
+#     # Flatten the structure
+#     flat_records = []
+#     for record in serializer.data:
+#         flat_record = {
+#             'user': record['user'],
+#             'feeding_number': record['breastfeeding_record']['feeding_number'],
+#             'is_breastfed': record['breastfeeding_record']['is_breastfed'],
+#             'date': record['date']
+#         }
+#         flat_records.append(flat_record)
+
+#     context['breastfeeding_records'] = flat_records
+
+#     return Response(context, status=status.HTTP_200_OK)
+
+
+
+
+from django.db import transaction
+from datetime import datetime, date
+from django.utils import timezone
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_breastfeeding_records(request):
     user = request.user
-    date_param = request.query_params.get('date', None)
+    context = {}
 
-    # Validate the date format (optional)
-    try:
-        if date_param:
-            dt.strptime(date_param, '%Y-%m-%d')
-    except ValueError:
-        return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=400)
+    # Get the date from query parameters, or use the current date if not provided
+    date = request.query_params.get('date', None)
+    if not date:
+        date = datetime.datetime.now().date()
 
-    # Filter records based on date parameter
-    records = BreastfeedingRecord.objects.filter(user=user, date=date_param)
-    serializer = BreastfeedingRecordSerializer(records, many=True)
-    return Response(serializer.data)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def create_breastfeeding_records(request):
-    user = request.user
-
-    date = request.data.get('date')
-
-    # Check if records for the given user and date already exist
-    existing_records = BreastfeedingRecord.objects.filter(
-        user=user,
-        date=date
-    )
-
-    # If records already exist, do nothing
-    if existing_records:
-        return Response({'message': 'Breastfeeding records already exist for this date'}, status=status.HTTP_200_OK)
+    # Assuming 'customer' is the related name in the User model for the BreastfeedingRecord
+    if user.role == 'CLIENT':
+        cid = user.id
     else:
-        # If records don't exist, create 20 new records for the user and date
-        for feeding_number in range(1, 21):
-            record = BreastfeedingRecord.objects.create(
+        cid = request.query_params.get('customer', None)
+        try:
+            user = User.objects.get(id=cid)
+            cid = user.id
+        except User.DoesNotExist:
+            return Response({"error": "client not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Check if records exist in UserBreastfeedingRecord
+    records = UserBreastfeedingRecord.objects.filter(user=user, date=date)
+    
+    if not records.exists():
+        # If no records, query from BreastfeedingRecord and create in UserBreastfeedingRecord
+        breastfeeding_records = BreastfeedingRecord.objects.all()
+        
+        for record in breastfeeding_records:
+            UserBreastfeedingRecord.objects.create(
                 user=user,
                 date=date,
-                feeding_number=feeding_number,
-                is_breastfed=False  # Set is_breastfed to False by default
+                feeding_number=record.feeding_number,
+                breastfeeding_record=record,
+                is_breastfed=False  # Set your default value here
             )
 
-    return Response({'message': 'Breastfeeding records created successfully'}, status=status.HTTP_201_CREATED)
+        
+        records = UserBreastfeedingRecord.objects.filter(user=user, date=date)
+
+    serializer = UserBreastfeedingRecordSerializer(records, many=True)
+
+    context['breastfeeding_records'] = serializer.data
+
+    return Response(context, status=status.HTTP_200_OK)
 
 
-@api_view(['PATCH'])
+
+
+@api_view(['POST', 'PATCH'])
 @permission_classes([IsAuthenticated])
-def edit_breastfeeding_record(request):
+def submit_breastfeeding_record(request):
     user = request.user
-    date = request.data.get('date')
-    feeding_number = request.data.get('feeding_number')
 
-    # Get the record for the specified user, date, and feeding_number
-    try:
-        record = BreastfeedingRecord.objects.get(
+    if request.method == 'POST':
+        date = request.data.get('date')
+        feeding_number = request.data.get('feeding_number')
+
+        # Check if records already exist for the given user, date, and feeding_number
+        existing_records = UserBreastfeedingRecord.objects.filter(user=user, date=date, feeding_number=feeding_number)
+
+        if existing_records.exists():
+            return Response({'error': 'Records already exist for this date and feeding number'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get or create the associated BreastfeedingRecord
+        is_breastfed = request.data.get('is_breastfed', False)
+        breastfeeding_record, created = BreastfeedingRecord.objects.get_or_create(
+            feeding_number=feeding_number,
+            defaults={'is_breastfed': is_breastfed}
+        )
+
+        # Create the UserBreastfeedingRecord
+        record = UserBreastfeedingRecord.objects.create(
             user=user,
             date=date,
-            feeding_number=feeding_number
+            feeding_number=feeding_number,
+            breastfeeding_record=breastfeeding_record,
+            is_breastfed=is_breastfed
         )
-    except BreastfeedingRecord.DoesNotExist:
-        return Response({'error': 'Record not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    # Update the is_breastfed field based on the request data
-    is_breastfed = request.data.get('is_breastfed', False)
-    record.is_breastfed = is_breastfed
-    record.save()
+        serializer = UserBreastfeedingRecordSerializer(record)
+        return Response({'message': 'Breastfeeding record created successfully', 'data': serializer.data}, status=status.HTTP_201_CREATED)
 
-    serializer = BreastfeedingRecordSerializer(record)
-    return Response({'message': 'Record updated successfully', 'data': serializer.data})
+    elif request.method == 'PATCH':
+        date = request.data.get('date')
+        feeding_number = request.data.get('feeding_number')
+
+        # Get the record for the specified user, date, and feeding_number
+        try:
+            record = UserBreastfeedingRecord.objects.get(
+                user=user,
+                date=date,
+                feeding_number=feeding_number
+            )
+        except UserBreastfeedingRecord.DoesNotExist:
+            return Response({'error': 'Record not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Update the is_breastfed field based on the request data
+        is_breastfed = request.data.get('is_breastfed', None)
+
+        # Check if is_breastfed is provided in the request data
+        if is_breastfed is not None:
+            # Convert the string value to a boolean using a simple function
+            is_breastfed = is_breastfed.lower() == "true"
+
+            # Update the record's breastfeeding_record field
+            record.is_breastfed = is_breastfed
+            record.breastfeeding_record.is_breastfed = is_breastfed
+
+            # Save both the UserBreastfeedingRecord and the associated BreastfeedingRecord
+            record.save()
+            record.breastfeeding_record.save()
+
+            # Fetch the record again to ensure the changes are reflected
+            record = UserBreastfeedingRecord.objects.get(id=record.id)
+
+        serializer = UserBreastfeedingRecordSerializer(record)
+        return Response({'message': 'Record updated successfully', 'data': serializer.data})
+
+    else:
+        return Response({'error': 'Invalid request method'}, status=status.HTTP_400_BAD_REQUEST)

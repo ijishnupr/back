@@ -6,3 +6,7 @@ from .models import *
 admin.site.register(Medicines)
 admin.site.register(MedicineTime)
 admin.site.register(LastUpdateDate)
+
+admin.site.register(BreastfeedingRecord)
+admin.site.register(UserBreastfeedingRecord)
+
