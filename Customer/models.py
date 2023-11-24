@@ -74,7 +74,7 @@ class TakenMedicine(models.Model):
 
 
 class BreastfeedingRecord(models.Model):
-    feeding_number = models.CharField()
+    feeding_number = models.CharField(max_length=50)
     is_breastfed = models.BooleanField(default=False)
 
     def __str__(self):
