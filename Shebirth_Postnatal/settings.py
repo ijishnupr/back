@@ -98,11 +98,11 @@ else:
     DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.postgresql',
-                'NAME': 'defaultdb',  # myproject
-                'USER': 'avnadmin',  # myprojectuser
-                'PASSWORD': 'AVNS_1KaWKuBIeMHeIfB5t0d', # password
-                'HOST': 'postnatal-freddydk296-e57f.aivencloud.com',
-                'PORT': '14017',  # 5432
+                'NAME': 'postnatal',  # myproject
+                'USER': 'postgres',  # myprojectuser
+                'PASSWORD': 'password', # password
+                'HOST': 'localhost',
+                'PORT': '5432',  # 5432
     }
 }
 
