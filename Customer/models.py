@@ -90,3 +90,90 @@ class UserBreastfeedingRecord(models.Model):
 
     def __str__(self):
         return f"User Breastfeeding Record - User: {self.user.firstname}, Record: {self.breastfeeding_record}"
+    
+
+class CaloriesBurnt(models.Model):
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField()
+    value = models.DecimalField(default=0, decimal_places=5, max_digits=100)
+    
+class Exercise(models.Model):
+    name=models.CharField(max_length=100)
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    done=models.BooleanField(default=False)
+    date=models.DateField()
+
+# diet's table 
+
+class Meal(models.Model):
+    name = models.CharField(max_length=300, null=True, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Meal (Manual)"
+
+
+
+class DietTracker(models.Model):
+    customer = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE, null=True)
+    date = models.DateField(null=True)
+    food = models.CharField(max_length=200)
+    time = models.CharField(max_length=50)
+    quantity=models.PositiveIntegerField(null=True,default=0)
+    calorie=models.PositiveIntegerField(null=True,default=0)
+
+    class Meta:
+        unique_together = ['customer', 'date', 'meal']
+        ordering = ['-date']
+
+    def __str__(self):
+        return self.food
+    
+class Vaccinations(models.Model):
+    name=models.CharField(max_length=30)
+    age=models.IntegerField()
+    against=models.CharField(max_length=40)
+
+    def __str__(self):
+        return self.food
+
+class Vaccination_user(models.Model):
+    user= models.ForeignKey(User, on_delete=models.CASCADE)
+    status=models.BooleanField(default=False)
+    vaccine=models.ForeignKey(Vaccinations,on_delete=models.CASCADE)
+    date=models.DateField(null=True,blank=True)
+   
+
+
+class Brain_sense(models.Model):
+    sense=models.CharField(max_length=10)
+    month=models.CharField(max_length=10)
+    question=models.CharField(max_length=20)
+   
+    
+    
+    def __str__(self):
+        return self.question
+    
+class Brain_sense_user(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    sense=models.ForeignKey(Brain_sense,on_delete=models.CASCADE)
+    ans=models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.sense
+
+#diapering modal
+    
+class Diapering(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    wet=models.BooleanField(default=True) #if the wet is true then it is wet else it is solied
+    start_date=models.DateField()
+    start_time=models.TimeField()
+    end_date=models.DateField()
+    end_time=models.TimeField()
+
+    

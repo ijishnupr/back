@@ -50,3 +50,5 @@ class Notes(models.Model):
 
     class Meta:
         unique_together = ['customer', 'stage', 'module']
+
+

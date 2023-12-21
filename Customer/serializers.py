@@ -68,3 +68,47 @@ class UserBreastfeedingRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserBreastfeedingRecord
         fields = ['user', 'breastfeeding_record', 'date', 'is_breastfed']
+
+class ExerciseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Exercise
+        fields='__all__'
+
+class Calserializer(serializers.ModelSerializer):
+    class Meta:
+        model=CaloriesBurnt
+        fields=['value']
+
+
+#diet serialzer
+class DietTrackerSerializer(serializers.ModelSerializer):
+    mealType = serializers.CharField(read_only=True)
+    mealName = serializers.CharField(source='meal.name', required=False)
+    # customerName = serializers.CharField(source='customer.firstname', required=False)
+    class Meta:
+        model = DietTracker
+        fields = '__all__'
+        extra_kwargs = {
+            'meal' : {'write_only' : True},
+            'customer' : {'write_only' : True},
+        }
+
+class mealSerialzer(serializers.ModelSerializer):
+    class Meta:
+        model=Meal
+        fields='__all__'
+
+
+class Vaccineserializer(serializers.ModelSerializer):
+    name=serializers.CharField(source='Vaccinations.name',read_only=True)
+    age=serializers.CharField(source='Vaccinations.age',read_only=True)
+    agent=serializers.CharField(source='Vaccinations.against',read_only=True)
+
+    class Meta:
+        model=Vaccination_user
+        fields = ('id', 'user', 'status', 'name','age','agent', 'date')
+
+class Brainuserserializer(serializers.ModelSerializer):
+    class Meta:
+        model=Brain_sense_user
+        fields='__all__'
