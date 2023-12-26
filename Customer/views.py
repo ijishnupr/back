@@ -799,3 +799,34 @@ def post_diaper(request):
         except Exception as e:
             print(str(e))
             return Response(str(e))
+        
+        #post api for sleep pattern
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def post_Sleep_pattern(request):
+    user = request.user
+    starttime = request.data.get('st')
+    startdate = request.data.get('sd')
+    endtime = request.data.get('et')
+    enddate = request.data.get('ed')
+    left = request.data.get('left')
+    print(user)
+    print(request.data)
+    if user is None or startdate is None or starttime is None or enddate is None or endtime is None or left is None:
+        print('hai')
+        return Response('Enter all values correctly [st, sd, et, ed, left   ]')
+    else:
+        try:
+            record = Sleep_pattern.objects.create(
+                user=user,
+                start_date=startdate,
+                start_time=starttime,
+                end_date=enddate,
+                end_time=endtime,
+                left=left,
+            )
+            print('created')
+            return Response('Data is created')
+        except Exception as e:
+            print(str(e))
+            return Response(str(e))

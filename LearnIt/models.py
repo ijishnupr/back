@@ -13,34 +13,19 @@ class Modules(models.Model):
     class Meta:
         verbose_name = 'Learnit module'
     
-
-
-class Stage(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-
 class Videos(models.Model):
     module = models.ForeignKey(Modules, on_delete=models.CASCADE)
-    stage = models.ForeignKey(Stage, on_delete=models.CASCADE)
     video = models.FileField(upload_to='videos/', null=True,blank=True)
     url = models.URLField(null=True,blank=True)
     faq = models.TextField(null=True, blank=True)   
     relatedPost = models.TextField(null=True, blank=True)   
-
-    class Meta:
-        unique_together = ['stage', 'module']
     
     def __str__(self):
-        return self.module.name + ' ' + self.stage.name
+        return self.module.name 
 
 
 class Notes(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
-    stage = models.ForeignKey(Stage, on_delete=models.CASCADE)
     module = models.ForeignKey(Modules, on_delete=models.CASCADE)
 
     notes = models.TextField(null=True, blank=True)
@@ -49,6 +34,6 @@ class Notes(models.Model):
         return self.customer.firstname + "'s note - "  + self.notes
 
     class Meta:
-        unique_together = ['customer', 'stage', 'module']
+        unique_together = ['customer', 'module']
 
 

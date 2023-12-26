@@ -13,7 +13,6 @@ from datetime import datetime
 from django.db.models.fields import DateField, DateTimeField
 from django.utils.timezone import make_aware
 from django.utils.timezone import now
-from LearnIt.models import Stage
 
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -171,6 +170,14 @@ class Brain_sense_user(models.Model):
 class Diapering(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     wet=models.BooleanField(default=True) #if the wet is true then it is wet else it is solied
+    start_date=models.DateField()
+    start_time=models.TimeField()
+    end_date=models.DateField()
+    end_time=models.TimeField()
+
+class Sleep_pattern(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    left=models.BooleanField(default=True) #if the left is true then it is left else it is right
     start_date=models.DateField()
     start_time=models.TimeField()
     end_date=models.DateField()

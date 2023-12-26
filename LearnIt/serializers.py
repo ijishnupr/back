@@ -14,7 +14,7 @@ class AddVideoSerializers(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {
             'module' : {'write_only' : True},
-            'stage' : {'write_only' : True},
+           
         }
 
     def get_video_id(self, obj):
@@ -35,7 +35,6 @@ class NoteSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {
             'module' : {'write_only' : True},
-            'stage' : {'write_only' : True},
             'customer' : {'write_only' : True},
         }
 

@@ -35,4 +35,6 @@ urlpatterns = [
     path('get-brain-stimulation',get_brain_stimulation),
     path('patch-babybrain',patch_baby_brain),
     path('post-diaper',post_diaper),
+    path('post-sleep-pattern',post_Sleep_pattern),
+    
 ]
