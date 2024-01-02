@@ -55,7 +55,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)  # Added is_staff field
     dateJoined = models.DateTimeField(default=timezone.now)
-
+    profile_img = models.ImageField(upload_to='ProfilePic/', null=True,blank=True, default= '/ProfilePic/default.jpg')
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['firstname', 'lastname']
 

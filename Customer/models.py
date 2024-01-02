@@ -184,3 +184,6 @@ class Sleep_pattern(models.Model):
     end_time=models.TimeField()
 
     
+
+
+

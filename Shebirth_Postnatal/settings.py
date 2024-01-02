@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'Consultant',
     'LearnIt',
     'Customer',
+    'Appointments'
 
 ]
 
@@ -164,6 +165,18 @@ REST_FRAMEWORK = {
     ),
 }
 
+CORS_ALLOW_HEADERS = [
+    'api-key',  # Add 'api-key' to the allowed headers
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Replace with the origin of your React app
     # You can add other allowed origins here

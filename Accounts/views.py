@@ -68,7 +68,7 @@ def doctor_registration(request):
         }
         
         # Create a new user
-        user_data['role'] = 'DOCTOR'
+        user_data['role'] = 2
         user = User.objects.create_user(**user_data)
 
         # Create the associated doctor details
@@ -161,7 +161,7 @@ def login_view(request):
 
             return JsonResponse(
                 {
-                    "message": f"{user_postnatal.role} logged in successfully.",
+                    "message": user_postnatal.role,
                     "token": token.key  # Include the token in the response
                 },
                 status=status.HTTP_200_OK

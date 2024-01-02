@@ -41,10 +41,10 @@ class DoctorRegistrationSerializer(serializers.Serializer):
     onlineConsultation = serializers.CharField(max_length=100, required=True)
     experience = serializers.IntegerField(required=True)
     age = serializers.IntegerField(required=True)
-    languages = serializers.CharField(max_length=500, required=True)
+    languages = serializers.CharField(max_length=500, required=False)
     location = serializers.CharField(max_length=200, required=False, allow_blank=True)
     referalId = serializers.CharField(max_length=100, required=False, allow_blank=True)
-    price = serializers.IntegerField(required=True)
+    price = serializers.IntegerField(required=False)
     gender = serializers.ChoiceField(choices=DoctorDetails.GENDER_CHOICES, required=False, allow_blank=True)
 
 
