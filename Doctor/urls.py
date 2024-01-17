@@ -7,4 +7,6 @@ urlpatterns = [
     path('get-doctors/' , get_doctors),
     path('doctor-dashboard-details/', doctor_dashboard_details),
     path('doctor-profile/', doctor_profile),
+    # Doctor filtering
+    path('doctor-filter/', doctor_filter),
 ]

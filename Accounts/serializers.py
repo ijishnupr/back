@@ -63,7 +63,7 @@ class SalesTeamRegistrationSerializer(serializers.Serializer):
         location = validated_data['location']
 
         # Create the user with the SALES role
-        user = User.objects.create_user(email=email, password=password, role='SALES', firstname=firstname, lastname=lastname)
+        user = User.objects.create_user(email=email, password=password, role=4, firstname=firstname, lastname=lastname)
 
         # Create SalesTeamDetails
         SalesTeamDetails.objects.create(user=user, location=location)

@@ -162,3 +162,23 @@ def doctor_profile(request):
     else:
         return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
 
+
+@api_view(['GET',])
+@permission_classes((IsAuthenticated,))
+def doctor_filter(request):
+    user = request.user
+    if user.role == User.CLIENT or user.role == User.DOCTOR:
+        speciality = request.query_params.get('speciality', None)
+        id = request.query_params.get('id', None)
+        if speciality is not None:
+            doctors = DoctorDetails.objects.filter(user__is_active=True, user__role=User.DOCTOR, speciality__icontains=speciality).prefetch_related('user')
+            serializer = DoctorDetailSerializer(doctors, many=True, context={'request' : request})
+        elif id is not None:
+            doctors = DoctorDetails.objects.filter(user__is_active=True, user__role=User.DOCTOR, user__id=id).prefetch_related('user')
+            serializer = DoctorDetailSerializer(doctors, many=True, context={'request' : request})
+        else:
+            return Response({'error' : "provide filter property"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data)
+    else:
+        return Response({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
+    
