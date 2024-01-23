@@ -13,10 +13,13 @@ urlpatterns = [
     path('sales_team_registration/', sales_team_registration, name='sales_team_registration'),
     path('consultant_registration/', consultant_registration, name='consultant_registration'),
     
+    # Admin section
 
+    path('signup_admin/',signup_admin),
+    path('login_admin/',login_admin),
 ]
 
-
+   
 
     
 

@@ -47,7 +47,9 @@ INSTALLED_APPS = [
     'Consultant',
     'LearnIt',
     'Customer',
-    'Appointments'
+    'Appointments',
+    'payment',
+    'admin',
 
 ]
 

@@ -111,3 +111,5 @@ class DoctorDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoctorDetails
         fields = ['id' ,'firstname', 'hospitals','lastname', 'email', 'age', 'location', 'councilRegNo', 'experience','qualification','speciality', 'accountStatus', 'price', 'gender', 'languages', 'referalId',]
+
+

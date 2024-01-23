@@ -11,9 +11,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.http import Http404
 from rest_framework.decorators import api_view, permission_classes
-
-
-
+from django.contrib.auth import authenticate,login
 
 # Create your views here.
 class UserRegistrationView(APIView):
@@ -284,3 +282,37 @@ def consultant_registration(request):
         user = serializer.save()
         return Response({"message": "Consultant registered successfully."}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# admin section
+from django.db.models import Count
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def signup_admin(request):
+    email=request.data.get('email')
+    password=request.data.get('password')
+    fname=request.data.get('fname')
+    lname=request.data.get('lname')
+    if email and password is not None:
+        user=User.objects.create_user(email=email,password=password,role=1,firstname=fname,lastname=lname)
+        return Response({'message':'created user'})
+    else:
+        return Response({'error':'enter email and password'})
+
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login_admin(request):
+    email=request.data.get('email')
+    password=request.data.get('password')
+    user=authenticate(request,email=email,password=password)
+    if user:
+        login(request,user)
+        token,created=Token.objects.get_or_create(user=user)
+
+        return Response({'token':token.key})
+    return Response('user not found',status=401)
+
+
