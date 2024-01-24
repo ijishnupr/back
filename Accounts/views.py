@@ -12,6 +12,8 @@ from rest_framework.response import Response
 from django.http import Http404
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import authenticate,login
+from django.db.models import Q
+from django.db.models import Prefetch
 
 # Create your views here.
 class UserRegistrationView(APIView):
@@ -286,6 +288,7 @@ def consultant_registration(request):
 
 # admin section
 from django.db.models import Count
+from payment.serializers import *
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -315,4 +318,55 @@ def login_admin(request):
         return Response({'token':token.key})
     return Response('user not found',status=401)
 
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def admin_dashboard(request):
+    user = request.user
+    if user:
+        counts = User.objects.aggregate(
+            totalConsultant=Count('id', filter=Q(role=User.CONSULTANT,is_active=True, consultantDetails__isnull = False)),
+            totalSalesTeam=Count('id', filter=Q(role=User.SALES,is_active=True)),
+            activeClients=Count('id', filter=Q(role=User.CLIENT,is_active=True)),
+            disabledDoctors=Count('id', filter=Q(role=User.DOCTOR,is_active=False)),
+            totalDoctors=Count('id', filter=Q(role=User.DOCTOR,is_active=True)),
+            totalClients=Count('id', filter=Q(role=User.CLIENT,is_active=True)))
+
+        print(counts)
+
+        CountSerializer = adminDashboardCountsSerializer(counts)
+    
+        clientDetails = CustomerDetails.objects.all()
+        clientDetails = totalClientSerializer.pre_loader(clientDetails)
+        serializer = totalClientSerializer(clientDetails, many=True, context={'request' : request})
+
+        memberships = MemberShip.objects.all()
+        membershipSerialized = Membership2Serializer(memberships, many=True)   
+
+        context = {
+            "MemberShipPlans" : membershipSerialized.data,
+            "counts" : CountSerializer.data,
+            # "totalDoctors" : totalDoctors.count(),
+            # "totalClients" : totalClients.count(),
+            # "totalHospitals" : totalHospitals,
+            # "totalConsultant" : totalConsultant,
+            # "totalSalesTeam" : totalSalesTeam,
+            # "activeClients" : activeClients,
+            # "disabledDoctors" : disabledDoctors,
+            "clientDetails" : serializer.data
+        }
+        return JsonResponse(context)
+    else:
+        return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
+@api_view(['GET',])
+@permission_classes((IsAuthenticated,))
+def all_doctors(request):
+    user = request.user
+    if user:
+        doctors = DoctorDetails.objects.filter(Q(user__is_active__in=[True])).prefetch_related('user')
+        serializer = DoctorDetailSerializer(doctors, many=True,context={'request' : request})
+        print('done')
+        return JsonResponse(serializer.data, safe=False)
+    else:
+        return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
 

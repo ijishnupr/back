@@ -1,5 +1,9 @@
 from rest_framework import serializers
 from .models import *
+from payment.models import *
+from datetime import datetime
+
+
 
 class UserPostNatalSerializer(serializers.ModelSerializer):
     class Meta:
@@ -112,4 +116,60 @@ class DoctorDetailSerializer(serializers.ModelSerializer):
         model = DoctorDetails
         fields = ['id' ,'firstname', 'hospitals','lastname', 'email', 'age', 'location', 'councilRegNo', 'experience','qualification','speciality', 'accountStatus', 'price', 'gender', 'languages', 'referalId',]
 
+
+# admin serializers
+from django.db.models import Prefetch
+   
+
+class totalClientSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='user.id')
+    email = serializers.CharField(source='user.email')
+    firstname = serializers.CharField(source='user.firstname')
+    lastname = serializers.CharField(source='user.lastname')
+    dateJoined = serializers.DateTimeField(source='user.dateJoined')
+    subscription = serializers.SerializerMethodField()
+  
+    doctor_firstname = serializers.CharField(source='referalId.user.firstname', required=False)
+    doctor_lastname = serializers.CharField(source='referalId.user.lastname', required=False)
+    is_active = serializers.BooleanField(source='user.is_active')
+   
+    profile_pic = serializers.ImageField(source="user.profile_img")
+    
+    class Meta:
+        model = CustomerDetails
+        fields = ['id', 'firstname', 'lastname', 'email', 'dateJoined', 'doctor_firstname', 'doctor_lastname', 'is_active','subscription', 'profile_pic']
+
+    
+
+    
+
+    def get_subscription(self, obj):
+        membership = PurchasedMembership.objects.filter(user = obj.user,is_paid = True).order_by('-pk')
+
+
+        if membership.exists():
+            return membership[0].membership.membership_name
+        
+                   
+        return "No plans"
+        
+
+
+    @staticmethod
+    def pre_loader(queryset):
+        queryset = queryset.prefetch_related(
+            'user',
+            'doctor_referal',
+          
+            Prefetch("user__sub_client", queryset=Subscriptions.objects.filter(is_active=True).prefetch_related('membership'))
+        )
+        return queryset
+    
+class adminDashboardCountsSerializer(serializers.Serializer):
+    totalConsultant = serializers.IntegerField()
+    totalSalesTeam = serializers.IntegerField()
+    activeClients = serializers.IntegerField()
+    disabledDoctors = serializers.IntegerField()
+    totalDoctors = serializers.IntegerField()
+    totalClients = serializers.IntegerField()
 

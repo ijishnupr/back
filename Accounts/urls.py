@@ -17,6 +17,8 @@ urlpatterns = [
 
     path('signup_admin/',signup_admin),
     path('login_admin/',login_admin),
+    path('admin_dashboard_details/',admin_dashboard),
+    path('all-doctors-list/', all_doctors),
 ]
 
    

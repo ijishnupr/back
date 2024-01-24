@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'Customer',
     'Appointments',
     'payment',
-    'admin',
+    
 
 ]
 
@@ -63,6 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'Shebirth_Postnatal.urls'
