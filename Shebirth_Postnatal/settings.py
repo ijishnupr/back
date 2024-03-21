@@ -90,25 +90,38 @@ WSGI_APPLICATION = 'Shebirth_Postnatal.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DB = False
-if DB:
+server=False
+if server:
     DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'shebirth$postnatal',
+        'USER': 'shebirth',
+        'PASSWORD': '1P1assword',
+        'HOST': 'shebirth.mysql.pythonanywhere-services.com',  # This is typically 'localhost' or provided by PythonAnywhere
+        'PORT': '3306',  # Leave empty for default MySQL port
     }
 }
-else:
-    DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': 'postnatal',  # myproject
-                'USER': 'postgres',  # myprojectuser
-                'PASSWORD': 'password', # password
-                'HOST': 'localhost',
-                'PORT': '5432',  # 5432
-    }
-}
+
+
+# if DB:
+#     DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+# else:
+#     DATABASES = {
+#             'default': {
+#                 'ENGINE': 'django.db.backends.postgresql',
+#                 'NAME': 'postnatal',  # myproject
+#                 'USER': 'postgres',  # myprojectuser
+#                 'PASSWORD': 'password', # password
+#                 'HOST': 'localhost',
+#                 'PORT': '5432',  # 5432
+#     }
+# }
 
 
 # Password validation
