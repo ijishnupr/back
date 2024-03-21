@@ -102,7 +102,17 @@ if server:
         'PORT': '3306',  # Leave empty for default MySQL port
     }
 }
-
+else:
+     DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'shebirth$postnatal',
+        'USER': 'root',
+        'PASSWORD': 'k3@B9fD$!n7x#Za1',
+        'HOST': 'localhost',  # This is typically 'localhost' or provided by PythonAnywhere
+        'PORT': '3306',  # Leave empty for default MySQL port
+    }
+}
 
 # if DB:
 #     DATABASES = {
