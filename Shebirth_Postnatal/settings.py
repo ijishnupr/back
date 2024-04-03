@@ -204,6 +204,6 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Replace with the origin of your React app
+    "http://localhost:3000","shebirth.pythonanywhere.com"  # Replace with the origin of your React app
     # You can add other allowed origins here
 ]
