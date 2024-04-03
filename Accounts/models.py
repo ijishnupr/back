@@ -47,7 +47,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, default=CLIENT)
-    email = models.EmailField(unique=True, max_length=255, default="example@email.com", blank=False)
+    email = models.EmailField(unique=True, max_length=300, default="example@email.com", blank=False)
     firstname = models.CharField(max_length=100, default="firstname")
     lastname = models.CharField(max_length=100, null=True)
     mobile = models.CharField(max_length=12, null=True, blank=True)

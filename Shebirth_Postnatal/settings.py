@@ -106,7 +106,7 @@ else:
      DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'shebirth$postnatal',
+        'NAME': 'db',
         'USER': 'root',
         'PASSWORD': 'k3@B9fD$!n7x#Za1',
         'HOST': 'localhost',  # This is typically 'localhost' or provided by PythonAnywhere

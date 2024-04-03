@@ -94,7 +94,7 @@ class UserBreastfeedingRecord(models.Model):
 class CaloriesBurnt(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField()
-    value = models.DecimalField(default=0, decimal_places=5, max_digits=100)
+    value = models.DecimalField(default=0, decimal_places=5, max_digits=60)
     
 class Exercise(models.Model):
     name=models.CharField(max_length=100)
