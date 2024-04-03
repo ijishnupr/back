@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-&#nzi^qd1-*(6s&9&&fcs=!xkygu&lq66b3jdx67razak+v3oc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["shebirth.pythonanywhere.com",]
 
 
 # Application definition
@@ -204,6 +204,5 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000","shebirth.pythonanywhere.com"  # Replace with the origin of your React app
-    # You can add other allowed origins here
+    "http://localhost:3000","shebirth.pythonanywhere.com",
 ]
