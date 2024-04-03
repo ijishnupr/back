@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'Shebirth_Postnatal.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-server=False
+server=True
 if server:
     DATABASES = {
     'default': {
