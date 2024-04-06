@@ -567,7 +567,7 @@ def diet_tracker_post(request):
         data['meal'] = meal.id
         data['customer'] = customer.id
         if request.data.get('date', None) is None:
-            data['date'] = datetime.datetime.now().date()
+            data['date'] = datetime.now().date()
         # if request.method == 'POST':
         #     serializer = DietTrackerSerializer(data=data)
         # else:
