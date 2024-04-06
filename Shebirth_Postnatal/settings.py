@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-&#nzi^qd1-*(6s&9&&fcs=!xkygu&lq66b3jdx67razak+v3oc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["shebirth.pythonanywhere.com",]
+ALLOWED_HOSTS = ["shebirth.pythonanywhere.com",'127.0.0.1']
 
 
 # Application definition
@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'Shebirth_Postnatal.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-server=True
+server=False
 if server:
     DATABASES = {
     'default': {
@@ -106,7 +106,7 @@ else:
      DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db',
+        'NAME': 'db_2',
         'USER': 'root',
         'PASSWORD': 'k3@B9fD$!n7x#Za1',
         'HOST': 'localhost',  # This is typically 'localhost' or provided by PythonAnywhere

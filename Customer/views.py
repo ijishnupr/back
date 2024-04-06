@@ -510,13 +510,10 @@ def patch_exercise(request):
 # diet tracker GET method
 @api_view(['GET',])
 def diet_tracker_get(request):
-    user = request.user
-    if user:
-        if user:
-            cid = user.id
-        else:
-            cid = request.query_params.get('customer', None)
-
+    
+    cid = request.query_params.get('customer')
+    if cid:
+        
         if cid is None:
             return Response({"Error" : "Provide 'customer': id in the params"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -539,7 +536,7 @@ def diet_tracker_get(request):
         return Response({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
 
 # submit diet taken
-
+from Accounts.models import User
 @api_view(['POST','PATCH'])
 @permission_classes((IsAuthenticated,))
 def diet_tracker_post(request):
@@ -611,7 +608,7 @@ def add_vaccine(request):
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Vaccinations, Vaccination_user
-from django.contrib.auth.models import User
+
 from collections import defaultdict
 
 def convert_age_to_months(age):
