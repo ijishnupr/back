@@ -95,7 +95,7 @@ if server:
     DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'shebirth$postnatal',
+        'NAME': 'shebirth$db_2',
         'USER': 'shebirth',
         'PASSWORD': '1P1assword',
         'HOST': 'shebirth.mysql.pythonanywhere-services.com',  # This is typically 'localhost' or provided by PythonAnywhere
