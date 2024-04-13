@@ -16,7 +16,7 @@ urlpatterns = [
     path('get_exercise/',get_exercises),
     path('add_exercise/',post_exercise),
     path('patch_exercise/',patch_exercise),
-
+    path('add_med_time/',add_medicine),
     #for diet tracker the cal data list is on antinatal
 
     path('diet-tracker-GET/', diet_tracker_get),

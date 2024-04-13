@@ -44,6 +44,15 @@ def update_date(instance, module):
         # LastUpdate.contraction = timezone_aware_date
         pass
     LastUpdate.save()
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+def add_medicine(request):
+    data=request.data.get('medicine')
+    save=MedicineTime.objects.get_or_create(name=data)
+    if save:
+        return Response('done')
+    else:
+        return Response('not done')
 
 @api_view(['GET',])
 @permission_classes((IsAuthenticated,))
