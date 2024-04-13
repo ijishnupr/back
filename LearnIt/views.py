@@ -17,7 +17,7 @@ from datetime import date
 def add_module(request):
     module=request.data.get('module')
     if module:
-        data=Modules.objects.create(name=module)
+        data=Modules.objects.get_or_create(name=module)
         return JsonResponse({'success':'done'})
     else:
         return JsonResponse({'error':'enter module'})
