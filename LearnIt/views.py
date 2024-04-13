@@ -16,8 +16,11 @@ from datetime import date
 @api_view(['POST'])
 def add_module(request):
     module=request.data.get('module')
-    data=Modules.objects.create(name=module)
-    return JsonResponse(status=200)
+    if module:
+        data=Modules.objects.create(name=module)
+        return JsonResponse({'success':'done'})
+    else:
+        return JsonResponse({'error':'enter module'})
 
 # Admin and sales adding videos
 @api_view(['POST',])
