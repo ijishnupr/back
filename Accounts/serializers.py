@@ -90,7 +90,7 @@ class ConsultantTeamRegistrationSerializer(serializers.Serializer):
         location = validated_data['location']
 
         # Create the user with the CONSULTANT role
-        user = User.objects.create_user(email=email, password=password, role='CONSULTANT', firstname=firstname, lastname=lastname)
+        user = User.objects.create_user(email=email, password=password, role=5, firstname=firstname, lastname=lastname)
 
         # Create ConsultantInfo
         ConsultantInfo.objects.create(user=user, location=location)
