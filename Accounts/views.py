@@ -370,3 +370,24 @@ def all_doctors(request):
     else:
         return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
 
+
+@api_view(['GET',])
+@permission_classes((IsAuthenticated,))
+def all_sales_team(request):
+    try:
+
+        user = request.user
+        sales = SalesTeamDetails.objects.filter(user__isnull = False, user__role = 4).prefetch_related('user')
+        if user.role == User.ADMIN:
+            serializer = SalesTeamSerializer(sales, many=True)
+        # elif user.role == User.CLIENT:
+        #     serializer = SalesSerializer(sales,many=True, context={'request':request})
+        else:
+            return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
+        context = {
+            'count' : len(serializer.data),
+                'details' : serializer.data
+            }
+        return JsonResponse(context)
+    except Exception as e:
+        pass

@@ -173,3 +173,17 @@ class adminDashboardCountsSerializer(serializers.Serializer):
     totalDoctors = serializers.IntegerField()
     totalClients = serializers.IntegerField()
 
+class SalesTeamSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='user.id')
+    firstname = serializers.CharField(source='user.firstname')
+    email = serializers.EmailField(source='user.email')
+    accountStatus = serializers.BooleanField(source='user.is_active')
+    password = serializers.CharField(source='passwordString')
+
+    class Meta:
+        model = SalesTeamDetails 
+        fields = '__all__'
+        extra_kwargs = {
+            'passwordString' : {'write_only' : True},
+            'user' : {'write_only' : True},
+        }

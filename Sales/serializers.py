@@ -41,4 +41,21 @@ class ClientDetialSerializer(serializers.ModelSerializer):
         except:
             return ""
 
- 
+class CustomerCallReposnseSerializer(serializers.ModelSerializer):
+    # reponse = serializers.PrimaryKeyRelatedField(queryset=CallResponses.objects.all())
+    callResponse = serializers.CharField(source='response.response', read_only=True)
+    class Meta:
+        model = CustomerCallReposnses
+        fields = '__all__'
+        extra_kwargs = {
+            'customer' : {'write_only' : True},
+            'response' : {'write_only' : True},
+            'sales' : {'write_only' : True}
+        }
+
+class CustomerCallReposnsesSerializer(serializers.ModelSerializer):
+    response = serializers.CharField(source='response.response', read_only=True)  # Use 'response.response' as the source
+
+    class Meta:
+        model = CustomerCallReposnses
+        fields = ['customer_id', 'response', 'note', 'date']        
