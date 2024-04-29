@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import *
 from payment.models import *
 from datetime import datetime
-
+from django.contrib.sites.shortcuts import get_current_site
 
 
 class UserPostNatalSerializer(serializers.ModelSerializer):
@@ -187,3 +187,21 @@ class SalesTeamSerializer(serializers.ModelSerializer):
             'passwordString' : {'write_only' : True},
             'user' : {'write_only' : True},
         }
+
+
+class ConsultantInfoSerializer(serializers.ModelSerializer):
+    accountStatus = serializers.BooleanField(source='user.is_active', read_only=True)
+    name = serializers.CharField(source='user.firstname', read_only=True)
+    email = serializers.EmailField(source='user.email', read_only=True)
+    profile_pic = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ConsultantInfo
+        fields = ['name', 'email', 'location', 'passwordString', 'accountStatus','user', 'profile_pic']
+
+    def get_profile_pic(self, obj):
+        request = self.context.get('request')
+        if obj.user.profile_img:
+            return "https://" + str(get_current_site(request)) + "/media/" + str(obj.user.profile_img)
+        else:
+            return "https://" + str(get_current_site(request)) + "/media/ProfilePic/" + str("default.jpg")

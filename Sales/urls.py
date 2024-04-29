@@ -14,5 +14,6 @@ urlpatterns = [
     path('no-update-clients/', no_update_clients),
     
     path('all-clients/', all_clients),
-    path('sales-team-called/',sales_team_called_list,)
+    path('sales-team-called/',sales_team_called_list),
+    path('clients-under-sales-team/', clients_under_sales),
 ]

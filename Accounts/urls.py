@@ -22,6 +22,7 @@ urlpatterns = [
      path('all-salesTeam-list/', all_sales_team ),
      # Activate or deactivate
     path('activateOrDeactivate/', activate_or_deactivate),
+     path('all-consultants-list/', all_consultants_list),
 ]
 
    

@@ -14,6 +14,7 @@ from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import authenticate,login
 from django.db.models import Q
 from django.db.models import Prefetch
+from Consultant.serializers import *
 
 # Create your views here.
 class UserRegistrationView(APIView):
@@ -415,3 +416,16 @@ def activate_or_deactivate(request):
             return JsonResponse({"Error" : "id not provided"}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def all_consultants_list(request):
+    user = request.user
+    consultants = ConsultantInfo.objects.filter(user__role = 5).prefetch_related('user')
+    if user.role == User.ADMIN:
+        serializer = ConsultantInfoSerializer(consultants, many=True, context={'request' : request})
+    elif user.role == User.CLIENT:
+        serializer = ConsultantSerializer(consultants, many=True, context={'request':request})
+    else:
+        return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
+    return JsonResponse({'data' : serializer.data, 'count' :consultants.count() }, safe=False)

@@ -8,7 +8,7 @@ from Accounts.models import *
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from .serializers import *
-
+from Accounts.serializers import totalClientSerializer
 # Create your views here.
 @api_view(['GET',])
 @permission_classes((IsAuthenticated,))
@@ -223,4 +223,27 @@ def sales_team_called_list(request):
 
     serializer = CustomerCallReposnsesSerializer(calls, many=True)
     return JsonResponse(serializer.data, safe=False)
+
+@api_view(['GET',])
+@permission_classes((IsAuthenticated,))
+def clients_under_sales(request):
+    user = request.user
+    sales = request.query_params.get('sales', None)
+    try:
+        # sales = SalesTeamDetails.objects.get(user=sales)
+        sales = User.objects.get(id=sales)
+        sales = sales.salesDetails.first()
+    except User.DoesNotExist:
+        return JsonResponse({"Error" : "sales team not found"}, status=status.HTTP_404_NOT_FOUND)
+    if user.role==User.ADMIN:
+       
+        CallResponse = CustomerCallReposnses.objects.filter(sales=user.id).distinct().values_list('customer')
+        total_ids = list(CallResponse)
+
+        clients = CustomerDetails.objects.filter(user__in=total_ids)
+        serializer = totalClientSerializer(clients, many=True)
+
+        return JsonResponse(serializer.data, safe=False)
+    else:
+        return JsonResponse({"Error" : "You dont have permission for that"}, status=status.HTTP_401_UNAUTHORIZED)
 
