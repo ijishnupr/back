@@ -391,3 +391,27 @@ def all_sales_team(request):
         return JsonResponse(context)
     except Exception as e:
         pass
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def activate_or_deactivate(request):
+    user = request.user
+    if user.role == User.ADMIN or user.role == User.HOSPITAL_MANAGER:
+        userID = request.data.get('id', None)
+        if userID is not None:
+            try:
+                user = User.objects.get(id=userID)
+            except User.DoesNotExist:
+                return JsonResponse({"Error" : "User not found"}, status=status.HTTP_404_NOT_FOUND)
+            Token.objects.filter(user=user).delete()
+            user.is_active = not user.is_active
+            user.save()
+            if user.is_active:
+                state = "Activated"
+            else:
+                state = "Deactivated"
+            return JsonResponse({"Success" : "Account " + state})
+        else:   
+            return JsonResponse({"Error" : "id not provided"}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)

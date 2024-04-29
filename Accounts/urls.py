@@ -20,6 +20,8 @@ urlpatterns = [
     path('admin_dashboard_details/',admin_dashboard),
     path('all-doctors-list/', all_doctors),
      path('all-salesTeam-list/', all_sales_team ),
+     # Activate or deactivate
+    path('activateOrDeactivate/', activate_or_deactivate),
 ]
 
    
