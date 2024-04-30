@@ -429,3 +429,15 @@ def all_consultants_list(request):
     else:
         return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
     return JsonResponse({'data' : serializer.data, 'count' :consultants.count() }, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def doctor_approval_requests(request):
+    user = request.user
+    if user.role == User.ADMIN:
+        doctors = DoctorDetails.objects.filter(user__is_active=False).prefetch_related('user', 'hospitalManager')
+        serializer = DoctorDetailSerializer(doctors, many=True, context={'request' : request})
+        return JsonResponse(serializer.data, safe=False)
+    else:
+        return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)

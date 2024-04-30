@@ -23,6 +23,7 @@ urlpatterns = [
      # Activate or deactivate
     path('activateOrDeactivate/', activate_or_deactivate),
      path('all-consultants-list/', all_consultants_list),
+       path('doctor-approval-requests/', doctor_approval_requests),
 ]
 
    
