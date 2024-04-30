@@ -144,10 +144,10 @@ def get_all_call_responses(request):
 def clients_this_month(request):
     user = request.user
     if user.role==User.SALES or user.role==User.ADMIN or user.role==User.CONSULTANT:
-        threshold_date = datetime.now().date() - timedelta(days=294) #42 weeks
+
         # total clients this month
         month = datetime.today().month
-        this_month_patients = CustomerDetails.objects.filter(user__dateJoined__month=month,Menstruation_date__gte=threshold_date).prefetch_related('referalId', 'referalId__user')
+        this_month_patients = CustomerDetails.objects.filter(user__dateJoined__month=month).prefetch_related('referalId', 'referalId__user')
         # details
         this_month_patient_details = ClientDetialSerializer(this_month_patients, many=True)
         return JsonResponse(this_month_patient_details.data, safe=False)
@@ -164,7 +164,7 @@ def no_update_clients(request):
     if user.role==User.SALES:
         lastUpdatedPatients = CustomerDetails.objects.filter(
             Q(user__is_active__in=[True])
-            & Q(user__last_update__diet__lt=time_threshold)
+
             & Q(user__last_update__activity__lt=time_threshold)
             & Q(user__last_update__symptom__lt=time_threshold)
             & Q(user__last_update__medicine__lt=time_threshold)).prefetch_related('user','referalId', 'referalId__user')
