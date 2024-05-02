@@ -145,10 +145,12 @@ def doctor_dashboard_details(request):
 @permission_classes((IsAuthenticated,))
 def doctor_profile(request):
     user = request.user
-    if user:
+    if user.role==2:
         id = user.id
+        
     else:
         id = request.query_params.get('doctor', None)
+        
     if not user.role == User.CONSULTANT:
         if id is not None:
             try:

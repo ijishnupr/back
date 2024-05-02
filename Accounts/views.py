@@ -15,7 +15,8 @@ from django.contrib.auth import authenticate,login
 from django.db.models import Q
 from django.db.models import Prefetch
 from Consultant.serializers import *
-
+from django.contrib.auth import get_user_model, password_validation as password_validators
+from django.core import exceptions
 # Create your views here.
 class UserRegistrationView(APIView):
     def post(self, request):
@@ -441,3 +442,59 @@ def doctor_approval_requests(request):
         return JsonResponse(serializer.data, safe=False)
     else:
         return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['PATCH'])
+@permission_classes((IsAuthenticated,))
+def password_change(request):
+    user = request.user
+    if user.role == User.CLIENT or user.role == User.DOCTOR:
+        password = request.data.get('password', None)
+        PasswordErrors = dict() 
+        if password is not None:
+            try:
+                password_validators.validate_password(password=password, user=User)
+            except exceptions.ValidationError as e:
+                PasswordErrors['password'] = list(e.messages)
+                return JsonResponse(PasswordErrors, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(password)
+            user.save()
+            return JsonResponse({'success' : 'password changed successfully'})
+    else:
+        return JsonResponse({'error', 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+@api_view(['GET',])
+@permission_classes((IsAuthenticated,))
+def customer_profile(request):
+    user = request.user
+    if not user.role == User.HOSPITAL_MANAGER and not user.role == User.DOCTOR:
+        if user.role == User.CLIENT:
+            cid = user.id
+        else:
+            cid = request.query_params.get('customer', None)
+        if cid is not None:
+            try:
+                customer = User.objects.get(id=cid)
+            except User.DoesNotExist:
+                return JsonResponse({"error" : "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            try:
+                details = CustomerDetails.objects.get(user=cid)
+            except CustomerDetails.DoesNotExist:
+                return JsonResponse({"error" : "Customer details not found."}, status=status.HTTP_404_NOT_FOUND)
+
+            customer = RegistrationSerializers(customer,context={'request':request})
+            details = CustomerDetailsSerializer(details)
+
+            context = {
+                "customer" : customer.data,
+                "details" : details.data
+            }
+
+            return JsonResponse(context, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({"Error" : "Customer is None"}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
+

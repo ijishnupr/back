@@ -205,3 +205,66 @@ class ConsultantInfoSerializer(serializers.ModelSerializer):
             return "https://" + str(get_current_site(request)) + "/media/" + str(obj.user.profile_img)
         else:
             return "https://" + str(get_current_site(request)) + "/media/ProfilePic/" + str("default.jpg")
+
+
+
+class RegistrationSerializers(serializers.ModelSerializer):
+    id = serializers.CharField( read_only=True)
+    password2 = serializers.CharField(style={'input_type':'passsword'}, write_only=True, required=False)
+    firstname = serializers.CharField(required=True)
+    email = serializers.CharField(required=True,validators=[UniqueValidator(queryset=User.objects.all(),message="An account with this email already exists")])
+    profile_pic = serializers.SerializerMethodField(read_only=True)
+    fcm_token = serializers.CharField(allow_blank=True, required=False)
+    
+
+
+
+    class Meta:
+        model = User
+        fields = ['email', 'firstname', 'lastname', 'mobile', 'password', 'password2','id','profile_pic','role','fcm_token']
+        extra_kwargs = {
+            'password' : {'write_only':True},
+            'lastname': {'required': True},
+            'mobile': {'required': True},
+            'role': {'required': True},
+        }
+
+    def save(self):
+        password = self.validated_data.get('password', None)
+        password2 = self.validated_data.get('password2', None)
+        email = self.validated_data.get('email',None)
+        firstname = self.validated_data.get('firstname', None)
+        lastname = self.validated_data.get('lastname', None)
+        mobile = self.validated_data.get('mobile', None)
+        role = self.validated_data.get('role', None)
+ 
+       
+        if email is not None:
+            email = email.lower()
+            if role == User.CLIENT:
+                user = User.objects.create_patient(email=email,password=password, firstname=firstname, lastname=lastname, mobile=mobile)
+        
+            elif role == User.DOCTOR:
+                user = User.objects.create_doctor(email=email,password=password, firstname=firstname, lastname=lastname, mobile=mobile)                
+            elif role == User.SALES:
+                user = User.objects.create_sales(email=email,password=password, firstname=firstname)
+            elif role == User.CONSULTANT:
+                user = User.objects.create_consultant(email=email,password=password, firstname=firstname)
+            elif role == User.HOSPITAL_MANAGER:
+                user = User.objects.create_hospitalManager(email=email,password=password, firstname=firstname)
+            else:
+                raise serializers.ValidationError({'Error':'User type not defined'})
+            return user
+
+    def validate_email(self, value):
+        lower_email = value.lower()
+        if User.objects.filter(email__iexact=lower_email).exists():
+            raise serializers.ValidationError("An account with this email already exists")
+        return lower_email
+
+    def get_profile_pic(self, obj):
+        request = self.context.get('request')
+        try:
+            return "https://" + str(get_current_site(request)) + "/media/" + str(obj.profile_img)
+        except:
+            return "https://" + str(get_current_site(request)) + "/media/ProfilePic/" + str("default.jpg")

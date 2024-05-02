@@ -24,6 +24,8 @@ urlpatterns = [
     path('activateOrDeactivate/', activate_or_deactivate),
      path('all-consultants-list/', all_consultants_list),
        path('doctor-approval-requests/', doctor_approval_requests),
+         path('password-change/', password_change),
+          path('customer-profile/', customer_profile),
 ]
 
    
