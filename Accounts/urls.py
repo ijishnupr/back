@@ -19,13 +19,14 @@ urlpatterns = [
     path('login_admin/',login_admin),
     path('admin_dashboard_details/',admin_dashboard),
     path('all-doctors-list/', all_doctors),
-     path('all-salesTeam-list/', all_sales_team ),
+    path('all-salesTeam-list/', all_sales_team ),
      # Activate or deactivate
     path('activateOrDeactivate/', activate_or_deactivate),
-     path('all-consultants-list/', all_consultants_list),
-       path('doctor-approval-requests/', doctor_approval_requests),
-         path('password-change/', password_change),
-          path('customer-profile/', customer_profile),
+    path('all-consultants-list/', all_consultants_list),
+    path('doctor-approval-requests/', doctor_approval_requests),
+    path('password-change/', password_change),
+    path('customer-profile/', customer_profile),
+    path('admin-update-customer-data/', admin_update_customer_data),
 ]
 
    

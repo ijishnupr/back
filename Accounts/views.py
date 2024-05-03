@@ -468,11 +468,12 @@ def password_change(request):
 @permission_classes((IsAuthenticated,))
 def customer_profile(request):
     user = request.user
-    if not user.role == User.HOSPITAL_MANAGER and not user.role == User.DOCTOR:
+    if user:
         if user.role == User.CLIENT:
             cid = user.id
         else:
             cid = request.query_params.get('customer', None)
+            
         if cid is not None:
             try:
                 customer = User.objects.get(id=cid)
@@ -491,10 +492,29 @@ def customer_profile(request):
                 "customer" : customer.data,
                 "details" : details.data
             }
-
+            print('this is the value to the frontend',context)
             return JsonResponse(context, status=status.HTTP_200_OK)
         else:
             return JsonResponse({"Error" : "Customer is None"}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
 
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated,])
+def admin_update_customer_data(request):
+    user_id = request.query_params.get('user_id')
+    if not user_id:
+        return Response({"error": "user_id parameter is required."}, status=400)
+
+    try:
+        customer = CustomerDetails.objects.get(user__id=user_id)
+    except CustomerDetails.DoesNotExist:
+        return Response({"error": "Customer not found for the specified user_id."}, status=404)
+
+    serializer = CustomerDetailsSerializer(customer, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        print(serializer.data)
+        return Response(serializer.data)
+    return Response(serializer.errors, status=400)
