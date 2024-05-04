@@ -27,6 +27,8 @@ urlpatterns = [
     path('password-change/', password_change),
     path('customer-profile/', customer_profile),
     path('admin-update-customer-data/', admin_update_customer_data),
+    path('video/', VideoLinkView.as_view(), ),
+    path('banner/' , BannerView.as_view()),
 ]
 
    

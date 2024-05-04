@@ -155,4 +155,13 @@ class ConsultantInfo(models.Model):
 
 
 
+class VideoLink(models.Model):
+    text = models.CharField(max_length=100)
+    link = models.TextField()
 
+    def __str__(self) -> str:
+        return self.text
+
+
+class Banner(models.Model):
+    image = models.ImageField(upload_to = "banner")

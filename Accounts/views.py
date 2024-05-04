@@ -518,3 +518,125 @@ def admin_update_customer_data(request):
         print(serializer.data)
         return Response(serializer.data)
     return Response(serializer.errors, status=400)
+
+
+class VideoLinkView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        try:
+            video = VideoLink.objects.all()
+            serializer = VideoLinkSerializer(video, many = True)
+            return Response({
+                'status' : True,
+                'data' : serializer.data
+            })
+        except Exception as e:
+            return JsonResponse({'status' : False ,'details' : {}})
+
+    def post(self , request):
+        try:
+            data = request.data
+            serializer = VideoLinkSerializer(data = data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                'status' : True,
+                'data' : serializer.data
+            })
+            return JsonResponse({'status' : False ,'details' : serializer.errors})
+        
+        except Exception as e:
+    
+            return JsonResponse({'status' : False ,'details' : {}})
+
+
+    def patch(self , request):
+        try:
+            data = request.data
+
+            id = data.get('id')
+            if id is None:
+                return JsonResponse({'status' : False ,'details' : 'id is required'})
+            
+            
+            obj = VideoLink.objects.get(id = id)
+            serializer = VideoLinkSerializer(obj,data = data, partial = True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                'status' : True,
+                'data' : serializer.data
+            })
+            return JsonResponse({'status' : False ,'details' : serializer.errors})
+        
+        except Exception as e:
+
+            return JsonResponse({'status' : False ,'details' : {}})
+    
+    def delete(self , request):
+        try:
+            data = request.data
+            if not data.get('id'):
+                return JsonResponse({'status' : False, 'message' : 'id is required' ,'details' : {}})
+
+            try:
+                video = VideoLink.objects.get(id = data.get('id')).delete()
+                return Response({
+                'status' : True,
+                'data' : ""
+                })
+            except Exception as e:
+                return JsonResponse({'status' : False, 'message' : 'invalid id ' ,'details' : {}})
+
+
+        except Exception as e:
+            return JsonResponse({'status' : False ,'details' : {}})
+
+class BannerView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        try:
+            banners = Banner.objects.all()
+            serializer = BannerSerializer(banners, many = True)
+            return Response({
+                'status' : True,
+                'data' : serializer.data
+            })
+        except Exception as e:
+            return JsonResponse({'status' : False ,'details' : {}})
+
+    def post(self , request):
+        try:
+            data = request.data
+            serializer = BannerSerializer(data = data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                'status' : True,
+                'data' : serializer.data
+            })
+            return JsonResponse({'status' : False ,'details' : serializer.errors})
+        
+        except Exception as e:
+    
+            return JsonResponse({'status' : False ,'details' : {}})
+
+    
+    def delete(self , request):
+        try:
+            data = request.data
+            if not data.get('id'):
+                return JsonResponse({'status' : False, 'message' : 'id is required' ,'details' : {}})
+
+            try:
+                banner = Banner.objects.get(id = data.get('id')).delete()
+                return Response({
+                'status' : True,
+                'data' : ""
+                })
+            except Exception as e:
+                return JsonResponse({'status' : False, 'message' : 'invalid id ' ,'details' : {}})
+
+
+        except Exception as e:
+            return JsonResponse({'status' : False ,'details' : {}})

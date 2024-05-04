@@ -268,3 +268,15 @@ class RegistrationSerializers(serializers.ModelSerializer):
             return "https://" + str(get_current_site(request)) + "/media/" + str(obj.profile_img)
         except:
             return "https://" + str(get_current_site(request)) + "/media/ProfilePic/" + str("default.jpg")
+
+class VideoLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VideoLink
+        fields = '__all__'
+
+
+
+class BannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Banner
+        fields = '__all__'
