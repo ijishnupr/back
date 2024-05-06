@@ -17,6 +17,7 @@ from django.db.models import Prefetch
 from Consultant.serializers import *
 from django.contrib.auth import get_user_model, password_validation as password_validators
 from django.core import exceptions
+from datetime import datetime, timedelta
 # Create your views here.
 class UserRegistrationView(APIView):
     def post(self, request):
@@ -640,3 +641,25 @@ class BannerView(APIView):
 
         except Exception as e:
             return JsonResponse({'status' : False ,'details' : {}})
+
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def all_clients_list(request):
+    user = request.user
+    
+    if user:
+        date = datetime.now().date()
+        threshold_date = date - timedelta(days=294) #42 weeks
+        # get all users with subscription
+        users_with_subs = Subscriptions.objects.filter(is_active=True).values_list('customer')
+        # clientDetails = CustomerDetails.objects.filter(user__is_verified=True, user__sub_client__is_active=True)
+        clientDetails = CustomerDetails.objects.filter(user__id__in=users_with_subs)
+        clientDetails = totalClientSerializer.pre_loader(clientDetails)
+        serializer = totalClientSerializer(clientDetails, many=True, context={'request' : request})
+        return JsonResponse(serializer.data, safe=False)
+    else:
+        return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
