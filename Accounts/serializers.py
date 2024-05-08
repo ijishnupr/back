@@ -280,3 +280,8 @@ class BannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banner
         fields = '__all__'
+
+class PlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Plans
+        fields='__all__'

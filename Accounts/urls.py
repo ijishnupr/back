@@ -30,6 +30,9 @@ urlpatterns = [
     path('video/', VideoLinkView.as_view(), ),
     path('banner/' , BannerView.as_view()),
     path('all-clients-list/', all_clients_list),
+    path('add_plans/',add_plan),
+    path('get_plans/',get_plan),
+    path('patch_plan/',patch_plan),
 ]
 
    

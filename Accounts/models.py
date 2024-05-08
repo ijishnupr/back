@@ -165,3 +165,10 @@ class VideoLink(models.Model):
 
 class Banner(models.Model):
     image = models.ImageField(upload_to = "banner")
+
+class Plans(models.Model):
+    name=models.CharField(max_length=100)
+    price=models.IntegerField()
+
+    def __str__(self):
+        return self.name
