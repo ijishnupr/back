@@ -95,3 +95,31 @@ def upcoming(request):
     else:
         return Response({'error' : "unauthorized request"}, status=status.HTTP_401_UNAUTHORIZED)
     return JsonResponse(serializer.data, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def get_doctor_appointments(request ,id):
+    try:
+        doctor = DoctorDetails.objects.get(user__id = id)
+        queryset = Appointments.objects.filter(doctor = doctor,completed = True)
+
+        serializer = NewDoctorSerializer(doctor,context={
+            'request' : request,
+            'sort_by' : request.GET.get('sort_by' ,'asc'),
+            'search' : request.GET.get('search' , None)
+            
+            })
+        return Response({
+            'status' : True,
+            'data' : serializer.data,
+            'message' : 'doctors fetched'
+        })
+    except Exception as e:
+        
+        return Response({
+            'status' : False,
+            'data' : {},
+            'message' : 'invalid doctor id'
+        })
+

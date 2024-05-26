@@ -240,3 +240,69 @@ class LatestAppointmentSerializer(serializers.ModelSerializer):
             'rescheduled_by_doctor', 'rescheduled_by_client', 'completed',
             'meeting_url', 'is_rescheduled', 'is_paid', 'uid', 'created_at'
         ]
+
+
+
+class NewDoctorSerializer(serializers.ModelSerializer):
+    appointments  = serializers.SerializerMethodField()
+   
+    firstname = serializers.CharField(source='user.firstname')
+    lastname = serializers.CharField(source='user.lastname')
+    email = serializers.CharField(source='user.email')
+    is_verified = serializers.CharField(source='user.is_verified')
+    profile_full_url = serializers.SerializerMethodField()
+    
+    
+    def get_serializer_context(self):
+        return {'sort_by': self.request.GET.get('sort_by')}
+
+
+    def get_appointments(self ,obj):
+        from Appointments.serializers import AppointmentSerializer
+        from django.db.models import Q
+        from django.utils.timezone import make_aware
+        queryset = Appointments.objects.filter(doctor = obj)
+      
+
+        if self.context.get('sort_by') == 'completed':
+            dateTimeCompleted = datetime.now() - timedelta(minutes=60)
+            queryset = queryset.filter(doctor=obj,approved=True,
+            schedule__lte=make_aware(dateTimeCompleted)).order_by('-schedule')
+
+            # queryset = queryset.filter(completed = True).order_by('date')
+        
+        if self.context.get('sort_by') == 'upcoming':
+            queryset = queryset.filter(schedule__gte  = datetime.now(), rejected = False, approved = True).order_by('date')
+
+        if self.context.get('search'):
+            search = self.context.get('search')
+            queryset = queryset.filter(
+                Q(customer__user__firstname__icontains = search) |
+                Q(customer__user__lastname__icontains = search) |
+                Q(customer__age__icontains = search) |
+                Q(schedule__icontains = search) 
+            ).order_by('date')
+
+
+
+
+    
+
+
+        serializer = AppointmentSerializer(queryset , many = True)
+        return serializer.data
+
+    def get_profile_full_url(self, obj):
+        request = self.context.get('request')
+        try:
+            return "https://" + str(get_current_site(request)) + "/media/" + str(obj.user.profile_img)
+        except:
+            return "https://" + str(get_current_site(request)) + "/media/ProfilePic/" + str("default.jpg")
+
+
+
+    class Meta:
+        model = DoctorDetails
+        fields = ['id' ,'firstname', 'hospitals','lastname', 'email', 'age', 'location',  'experience','qualification','speciality',  'gender', 'languages', 'referalId', 'is_verified', 'profile_full_url','appointments' ,]
+
+

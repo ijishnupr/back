@@ -66,7 +66,7 @@ def my_patients(request):
 def get_doctors(request):
     doctors = DoctorDetails.objects.filter(
         user__is_active=True,
-        user__role=User.ROLES[1][0]  # Assuming 'DOCTOR' is the second role in the choices tuple
+        user__role=2
     ).prefetch_related('user')
 
     serializer = DoctorDetailSerializer(doctors, many=True, context={'request': request})
