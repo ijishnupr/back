@@ -12,10 +12,9 @@ class BookingSerializer(serializers.ModelSerializer):
     formated_date = serializers.DateTimeField(source="schedule", format="%d-%m-%Y", read_only=True)
     formated_time = serializers.DateTimeField(source="schedule",read_only=True, format="%I:%M %p") 
     clientName = serializers.SerializerMethodField(read_only=True)
-    location = serializers.SerializerMethodField(read_only=True)
+   
     meeting_open = serializers.BooleanField(default=False, read_only=True)
-    week = serializers.SerializerMethodField(read_only=True)
-    days = serializers.SerializerMethodField(read_only=True)
+
     client_profile_pic = serializers.SerializerMethodField()
     doctor_profile_pic = serializers.SerializerMethodField()
 
@@ -32,19 +31,6 @@ class BookingSerializer(serializers.ModelSerializer):
             'customer' : {'write_only' : True},
         }
 
-    def get_week(self, obj):
-        periods_date =  obj.customer.Menstruation_date
-        today = datetime.now().date()
-        daysPregnant = today - periods_date
-        week = daysPregnant.days/7
-        return int(week)
-
-    def get_days(self, obj):
-        periods_date =  obj.customer.Menstruation_date
-        today = datetime.now().date()
-        days_pregnant = today - periods_date
-        days_completed = (days_pregnant.days % 365) % 7
-        return int(days_completed)
 
     def get_client_profile_pic(self, obj):
         profile_img =  obj.customer.user.profile_img
@@ -73,13 +59,7 @@ class BookingSerializer(serializers.ModelSerializer):
         return obj.customer.user.firstname 
         
 
-    def get_location(self, obj):
-        location = obj.customer.location
-        if location != None:
-            return location
-        return ""
-
-
+  
 class CompletedSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     doctor = serializers.SerializerMethodField()
@@ -122,29 +102,14 @@ class TodaysAppointmentSerializer(serializers.ModelSerializer):
     time = serializers.DateTimeField(source="schedule", format="%H:%M %p")
     date = serializers.DateTimeField(source="schedule", format="%d-%m-%Y")
     meeting_open = serializers.BooleanField(default=False)
-    location = serializers.CharField(source="customer.location")
-    week = serializers.SerializerMethodField()
-    days = serializers.SerializerMethodField()
+   
+  
     client_profile_pic = serializers.ImageField(source='customer.user.profile_img')
     doctor_profile_pic = serializers.ImageField(source='doctor.user.profile_img')
 
     class Meta:
         model = Appointments
-        fields = ['id', 'firstname','lastname','time','date', 'meeting_url','meeting_open', 'location', 'week', 'days','doctor_profile_pic', 'client_profile_pic']
-
-    def get_week(self, obj):
-        periods_date =  obj.customer.Menstruation_date
-        today = datetime.now().date()
-        daysPregnant = today - periods_date
-        week = daysPregnant.days/7
-        return int(week)
-
-    def get_days(self, obj):
-        periods_date =  obj.customer.Menstruation_date
-        today = datetime.now().date()
-        days_pregnant = today - periods_date
-        days_completed = (days_pregnant.days % 365) % 7
-        return int(days_completed)
+        fields = ['id', 'firstname','lastname','time','date', 'meeting_url','meeting_open','doctor_profile_pic', 'client_profile_pic']
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
@@ -303,6 +268,6 @@ class NewDoctorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DoctorDetails
-        fields = ['id' ,'firstname', 'hospitals','lastname', 'email', 'age', 'location',  'experience','qualification','speciality',  'gender', 'languages', 'referalId', 'is_verified', 'profile_full_url','appointments' ,]
+        fields = ['id' ,'firstname', 'hospitals','lastname', 'email', 'age',  'experience','qualification','speciality',  'gender', 'languages', 'referalId', 'is_verified', 'profile_full_url','appointments' ,]
 
 

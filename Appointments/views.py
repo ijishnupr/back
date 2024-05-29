@@ -29,7 +29,7 @@ from django.db.models import Q,Case,When, Value, BooleanField
 @permission_classes((IsAuthenticated,))
 def full_apointments(request):
     user = request.user
-    if user.role == User.DOCTOR:
+    if user.role == 2:
         doctor = user.id
         try:
             doctor = DoctorDetails.objects.get(user=doctor)
@@ -123,3 +123,128 @@ def get_doctor_appointments(request ,id):
             'message' : 'invalid doctor id'
         })
 
+
+@api_view(['POST',])
+@permission_classes((IsAuthenticated,))
+def customer_booking(request):
+    user = request.user
+    if user.role == 3:
+        doctor = request.data.get('doctor', None)
+        date = request.data.get('date', None)
+        time = request.data.get('time', None)
+        customer = request.user.id
+
+        doctor_info = {}
+        doctor_price = None
+        if doctor is not None:
+            try:
+                doctor = DoctorDetails.objects.select_related('user').get(user=doctor)
+                doctor_price = doctor.price
+                doctor_info = {
+                    "doctor_name" : doctor.user.firstname,
+                    "doctor_speciality" : doctor.speciality,
+                    "doctor_age" : doctor.age,
+                    "doctor_price" : doctor.price,
+                    "doctor_qualification" : doctor.qualification,
+                    "doctor_interests" : doctor.interests,
+                    "doctor_experience" : doctor.experience,
+                    "doctor_languages" : doctor.languages,
+                    
+                    "doctor_gender" : doctor.gender,
+                }
+            except DoctorDetails.DoesNotExist:
+                return JsonResponse({"Error" : "doctor does not exist"}, status=status.HTTP_404_NOT_FOUND)
+            try:
+                customer = CustomerDetails.objects.get(user=request.user.id)
+            except User.DoesNotExist:
+                return JsonResponse({"Error" : "Customer does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return JsonResponse({"Error" : "Customer and doctor are required to make an appointment."})
+
+        data = request.data.copy()
+        data['customer'] = customer.id
+        data['doctor'] = doctor.id
+
+        if doctor_price is not None and doctor_price <= 0:
+            data['is_paid'] = True
+
+        try:
+            schedule = datetime.combine(datetime.fromisoformat(date), datetime.strptime(time.replace(" ", ""), '%H:%M').time()) # without pm
+        except:
+            schedule = datetime.combine(datetime.fromisoformat(date), datetime.strptime(time.replace(" ", ""), '%H:%M%p').time()) # with am and pm
+        data['schedule'] = schedule
+
+        serializer = BookingSerializer(data=data, context={'request': request})
+
+        if serializer.is_valid(raise_exception=True):
+            appointment = serializer.save()
+            data = serializer.data
+            data['doctor_info'] = doctor_info
+            return JsonResponse(data)
+        else:
+            return JsonResponse(serializer.errors)
+    else:
+        return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
+# getting approved
+
+
+@api_view(['POST',])
+@permission_classes((IsAuthenticated,))
+def reject(request):
+    user = request.user
+    if user.role == 2 or user.role == 3:
+        appointmentID = request.data.get('appointmentID', None)
+        if appointmentID is not None:
+            try:
+                appointment = Appointments.objects.get(id=appointmentID)
+            except Appointments.DoesNotExist:
+                return JsonResponse({"error" : "Appointment not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+            # payments = AppointmentPayments.objects.filter(appointment=appointmentID,captured=True)
+            # if payments:
+            #     payment = payments.first()
+            #     client.payments.refund(payment.payment_id,{
+            #         "amount": payment.amount,
+            #         "speed": "optimum"
+            #     })
+
+            appointment.rejected = True
+            appointment.approved = False
+            appointment.rescheduled_by_doctor = False
+            appointment.rescheduled_by_client = False
+            appointment.save()
+            
+            
+            # serializer = BookingSerializer(appointment)
+
+            return JsonResponse({"Success" : "appointment rejected"})
+        else:
+            return JsonResponse({"Error" : "appointmentID is required"}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['POST',])
+@permission_classes((IsAuthenticated,))
+def approve(request):
+    user = request.user
+    if user.role == 2:
+        appointmentID = request.data.get('appointmentID', None)
+        if appointmentID is not None:
+            try:
+                appointment = Appointments.objects.select_related('customer', 'customer__user').get(id=appointmentID)
+            except Appointments.DoesNotExist:
+                return JsonResponse({"error" : "Appointment not found"}, status=status.HTTP_404_NOT_FOUND)
+            meeting_url = "createMeeting()"
+            appointment.approved = True
+            appointment.rejected = False
+            appointment.rescheduled = False
+            appointment.meeting_url = meeting_url
+            appointment.save()
+
+           
+            return JsonResponse({"Success" : "Appointment approved."})
+        else:
+            return JsonResponse({"Error" : "appointmentID is required"}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)

@@ -95,7 +95,7 @@ class DoctorDetails(models.Model):
     languages = models.CharField(max_length=500 ,default='')
     location = models.CharField(max_length=200, null=True,blank=True)
     referalId = models.CharField(max_length=100, null=True,unique=True)
-    price =  models.IntegerField(default=0)
+    price =  models.IntegerField(default=10)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=100, null=True, blank=True)
 
     def __str__(self):

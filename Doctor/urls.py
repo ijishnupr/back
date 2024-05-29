@@ -9,4 +9,5 @@ urlpatterns = [
     path('doctor-profile/', doctor_profile),
     # Doctor filtering
     path('doctor-filter/', doctor_filter),
+    
 ]
