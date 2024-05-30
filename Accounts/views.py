@@ -381,7 +381,7 @@ def all_sales_team(request):
 
         user = request.user
         sales = SalesTeamDetails.objects.filter(user__isnull = False, user__role = 4).prefetch_related('user')
-        if user.role == User.ADMIN:
+        if user:
             serializer = SalesTeamSerializer(sales, many=True)
         # elif user.role == User.CLIENT:
         #     serializer = SalesSerializer(sales,many=True, context={'request':request})
