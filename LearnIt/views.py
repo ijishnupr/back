@@ -1,17 +1,14 @@
 
-from os import stat
 from .serializers import *
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 # from rest_framework.renderers import JSONRenderer
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 # from rest_framework_api_key.permissions import HasAPIKey
-from Accounts.models import CustomerDetails
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-from datetime import date
 
 @api_view(['POST'])
 def add_module(request):

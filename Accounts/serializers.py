@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import *
 from payment.models import *
-from datetime import datetime
 from django.contrib.sites.shortcuts import get_current_site
 
 

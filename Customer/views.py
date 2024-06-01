@@ -1,6 +1,3 @@
-from django.shortcuts import render
-from multiprocessing import context
-from os import stat
 from django.db.models.query import Prefetch
 from .serializers import *
 from rest_framework.response import Response
@@ -8,10 +5,9 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.utils.timezone import make_aware
-from datetime  import date, timedelta, datetime
+from datetime  import date, datetime
 import datetime
 from .models import LastUpdateDate
-from django.http import JsonResponse
 # Create your views here.
 
 from django.contrib.auth import get_user_model 
@@ -310,7 +306,6 @@ def add_brestfeeding_record(request):
         return Response('number not provided ')
 
 
-from django.db import transaction
 from datetime import datetime, date
 from django.utils import timezone
 

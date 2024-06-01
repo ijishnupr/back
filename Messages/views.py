@@ -1,4 +1,3 @@
-from os import stat
 from Accounts.models import CustomerDetails, DoctorDetails,SalesTeamDetails,ConsultantInfo
 from .models import *
 from .serializers import *

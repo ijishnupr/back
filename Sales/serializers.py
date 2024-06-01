@@ -1,9 +1,6 @@
 
 from rest_framework import serializers
 from .models import *
-from datetime import timedelta
-from datetime import timedelta, datetime
-import sys, os
 from Accounts.models import CustomerDetails
 class ClientDetialSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()

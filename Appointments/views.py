@@ -1,5 +1,4 @@
 
-from multiprocessing import context
 from Accounts.models import CustomerDetails, DoctorDetails
 # from django.shortcuts import render
 
@@ -10,20 +9,13 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 # from rest_framework.renderers import JSONRenderer
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 # from rest_framework_api_key.permissions import HasAPIKey
-from django.db.models import Q
 from .models import Appointments
-from django.conf import settings
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 # from django.utils import timezone
-from twilio.rest import Client
-import jwt
-import requests
-import json
-from time import time 
 from django.utils.timezone import make_aware
-from django.db.models import Q,Case,When, Value, BooleanField
+from django.db.models import Case, When, Value, BooleanField
 
 @api_view(['GET',])
 @permission_classes((IsAuthenticated,))

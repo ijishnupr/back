@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,7 +6,7 @@ from Accounts.models import DoctorDetails, CustomerDetails
 from Accounts.serializers import *
 from datetime import timedelta
 import datetime
-from django.db.models import Q, Count,Case,When, Value, BooleanField
+from django.db.models import Q, Count
 from .serializers import *
 from django.http import JsonResponse
 from django.utils.timezone import make_aware
@@ -15,7 +14,6 @@ from Accounts.models import *
 from Appointments.models import Appointments
 from Appointments.serializers import *
 from django.contrib.sites.shortcuts import get_current_site
-from django.db.models.query import Prefetch
 @api_view(['GET'])
 @permission_classes([])  # You might need to define your permission classes
 def customers_under_doctor(request):

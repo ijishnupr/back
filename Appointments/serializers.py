@@ -1,6 +1,5 @@
 # from django.db.models import fields
 from rest_framework import serializers
-from django.utils.timezone import make_aware
 from .models import *
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site

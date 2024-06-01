@@ -1,16 +1,12 @@
 from django.db import models
-from django.db.models.fields import DateField, DateTimeField
+from django.db.models.fields import DateField
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-from enum import unique
-from faulthandler import disable
-from logging import critical
-from re import S
 from django.db import models
 from datetime import datetime
-from django.db.models.fields import DateField, DateTimeField
+from django.db.models.fields import DateField
 from django.utils.timezone import make_aware
 from django.utils.timezone import now
 

@@ -1,21 +1,16 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from .serializers import *
 from .models import *
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser, BasePermission
-from rest_framework import generics
-from django.shortcuts import get_object_or_404
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from django.http import Http404
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import authenticate,login
 from django.db.models import Q
-from django.db.models import Prefetch
 from Consultant.serializers import *
-from django.contrib.auth import get_user_model, password_validation as password_validators
+from django.contrib.auth import password_validation as password_validators
 from django.core import exceptions
 from datetime import datetime, timedelta
 # Create your views here.

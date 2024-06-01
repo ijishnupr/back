@@ -1,11 +1,8 @@
 from rest_framework import serializers
 from .models import *
 from django.contrib.sites.shortcuts import get_current_site
-from django.db.models import Q
 from datetime import timedelta
-from django.utils import timezone
-from django.utils.timezone import make_aware
-from Accounts.models import CustomerDetails, SalesTeamDetails, DoctorDetails,ConsultantInfo
+from Accounts.models import SalesTeamDetails, ConsultantInfo
 
 
 class AllMessageSerializer(serializers.Serializer):

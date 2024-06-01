@@ -3,7 +3,6 @@ from Accounts.models import CustomerDetails
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from Accounts.models import *
-from datetime import timedelta, datetime
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):

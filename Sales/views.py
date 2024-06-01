@@ -1,11 +1,9 @@
-from django.shortcuts import render
 from datetime import datetime, timedelta, timezone
-from django.utils import timezone as djangotimezone
-from django.db.models import Q, Prefetch
+from django.db.models import Q
 from django.http import JsonResponse
 from rest_framework import status
 from Accounts.models import *
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from .serializers import *
 from Accounts.serializers import totalClientSerializer
