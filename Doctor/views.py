@@ -81,7 +81,7 @@ from django.db.models.functions import TruncMonth
 @permission_classes((IsAuthenticated,))
 def doctor_dashboard_details(request):    
     user = request.user
-    if user:
+    if user.role == 2:
         if id is not None:
             
             try:
@@ -100,11 +100,11 @@ def doctor_dashboard_details(request):
             # patients in the current month
             date_threshold =  make_aware(datetime.now() - timedelta(minutes=15))
             approvalTime = make_aware(datetime.now())
-
             currentMonth = date_threshold.month
             customers_thisMonth = totalCustomers.filter(user__dateJoined__month=currentMonth).count()
 
-            needsApproval = Appointments.objects.filter(doctor=user.id, approved=False,rejected=False, schedule__gte=approvalTime).count()
+            needsApproval = Appointments.objects.filter(doctor=details.id, approved=False,rejected=False, schedule__gte=approvalTime).count()
+            
 
             todaysAppointments = Appointments.objects.filter(doctor=details.id, approved=True, schedule__date=date_threshold.date())
 
@@ -118,7 +118,7 @@ def doctor_dashboard_details(request):
 
             GdSerializer = GraphDataSerializer(graphData, many=True)
             profile_pic = user.profile_img
-            print(profile_pic)
+            
             # return "https://" + str(get_current_site(request)) + "/media/" + str(obj.profile_img)
             # else:
             #     return "https://" + str(get_current_site(request)) + "/media/ProfilePic/" + str("default.jpg")

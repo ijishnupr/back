@@ -31,13 +31,13 @@ def full_apointments(request):
         current_timestamp = make_aware(datetime.now())
         dateTimeCompleted = datetime.now() - timedelta(minutes=60)
 
-        approved = Appointments.objects.filter(doctor=doctor.id ,is_paid = True,approved=True,schedule__gte=current_timestamp - timedelta(minutes=15)).prefetch_related('customer','customer__user').order_by('-schedule').annotate(
+        approved = Appointments.objects.filter(doctor=doctor.id ,approved=True,schedule__gte=current_timestamp - timedelta(minutes=15)).prefetch_related('customer','customer__user').order_by('-schedule').annotate(
             meeting_open=Case(
                     When(schedule__range=[current_timestamp - timedelta(minutes=15), current_timestamp], then=Value(True)),default=Value(False), output_field=BooleanField()
                 )
         )
         
-        rejected = Appointments.objects.filter(doctor=doctor.id , is_paid = True,rejected=True).prefetch_related('customer','customer__user').order_by('-schedule')
+        rejected = Appointments.objects.filter(doctor=doctor.id ,rejected=True).prefetch_related('customer','customer__user').order_by('-schedule')
         completed = Appointments.objects.filter(doctor=doctor.id, is_paid = True,approved=True,schedule__lte=make_aware(dateTimeCompleted)).prefetch_related('customer','customer__user').order_by('-schedule')
 
         ApprovedSerializer = BookingSerializer(approved, many=True, context={'request': request})
@@ -92,28 +92,22 @@ def upcoming(request):
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def get_doctor_appointments(request ,id):
-    try:
-        doctor = DoctorDetails.objects.get(user__id = id)
-        queryset = Appointments.objects.filter(doctor = doctor,completed = True)
+    
+    doctor = DoctorDetails.objects.get(user__id = id)
+    queryset = Appointments.objects.filter(doctor = doctor,completed = True)
 
-        serializer = NewDoctorSerializer(doctor,context={
-            'request' : request,
-            'sort_by' : request.GET.get('sort_by' ,'asc'),
-            'search' : request.GET.get('search' , None)
-            
-            })
-        return Response({
-            'status' : True,
-            'data' : serializer.data,
-            'message' : 'doctors fetched'
-        })
-    except Exception as e:
+    serializer = NewDoctorSerializer(doctor,context={
+        'request' : request,
+        'sort_by' : request.GET.get('sort_by' ,'asc'),
+        'search' : request.GET.get('search' , None)
         
-        return Response({
-            'status' : False,
-            'data' : {},
-            'message' : 'invalid doctor id'
         })
+    return Response({
+        'status' : True,
+        'data' : serializer.data,
+        'message' : 'doctors fetched'
+    })
+
 
 
 @api_view(['POST',])
@@ -240,3 +234,22 @@ def approve(request):
             return JsonResponse({"Error" : "appointmentID is required"}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['GET',])
+@permission_classes((IsAuthenticated,))
+def approval_requests(request):
+    # doctor = request.query_params.get('doctor', None)
+    user = request.user
+    dateTime = make_aware(datetime.now())
+    if user.role == 2:
+        try:
+            doctorDetails = user.docDetails.first()
+        except DoctorDetails.DoesNotExist:
+            return JsonResponse({"Error" : "consultant not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        data = Appointments.objects.filter(approved=False,rejected=False, doctor=doctorDetails.id, schedule__gte=dateTime)
+        needs_approval = BookingSerializer(data, many=True, context={'request':request})
+        return Response(needs_approval.data)
+    else:
+        return Response({'error' : 'unauthorized request'}, status=status.HTTP_401_UNAUTHORIZED)

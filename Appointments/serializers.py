@@ -213,7 +213,6 @@ class NewDoctorSerializer(serializers.ModelSerializer):
     firstname = serializers.CharField(source='user.firstname')
     lastname = serializers.CharField(source='user.lastname')
     email = serializers.CharField(source='user.email')
-    is_verified = serializers.CharField(source='user.is_verified')
     profile_full_url = serializers.SerializerMethodField()
     
     
@@ -267,6 +266,6 @@ class NewDoctorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DoctorDetails
-        fields = ['id' ,'firstname', 'hospitals','lastname', 'email', 'age',  'experience','qualification','speciality',  'gender', 'languages', 'referalId', 'is_verified', 'profile_full_url','appointments' ,]
+        fields = ['id' ,'firstname', 'hospitals','lastname', 'email', 'age',  'experience','qualification','speciality',  'gender', 'languages', 'referalId', 'profile_full_url','appointments' ]
 
 
